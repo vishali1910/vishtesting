@@ -1,0 +1,3219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Interview Prep — The Tester's Handbook</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2128;
+  --border: #30363d;
+  --green: #3fb950;
+  --green-dim: #1a4028;
+  --green-glow: rgba(63,185,80,0.15);
+  --cyan: #58a6ff;
+  --cyan-dim: #0d2342;
+  --orange: #f0883e;
+  --orange-dim: #3d1f0a;
+  --red: #f85149;
+  --yellow: #e3b341;
+  --purple: #bc8cff;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --text-dim: #484f58;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(63,185,80,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(63,185,80,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== HEADER ===== */
+header {
+  position: relative;
+  z-index: 10;
+  padding: 3rem 2rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  animation: pulse-border 3s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(63,185,80,0); }
+  50% { box-shadow: 0 0 12px 2px rgba(63,185,80,0.2); }
+}
+
+.header-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+
+h1 .accent { color: var(--green); }
+h1 .dim { color: var(--text-muted); font-weight: 400; }
+
+.header-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+  max-width: 560px;
+  margin-bottom: 2rem;
+}
+
+.header-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stat-num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ===== SEARCH ===== */
+.search-wrap {
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-box {
+  position: relative;
+  max-width: 600px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+#search-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#search-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(63,185,80,0.1);
+}
+
+#search-input::placeholder { color: var(--text-dim); }
+
+.search-count {
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+/* ===== NAV TABS ===== */
+.nav-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-inner::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-tab:hover { color: var(--text); }
+
+.nav-tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+
+.nav-tab .tab-count {
+  background: var(--surface2);
+  color: var(--text-dim);
+  font-size: 0.55rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 2px;
+}
+
+.nav-tab.active .tab-count {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+/* ===== MAIN LAYOUT ===== */
+main {
+  position: relative;
+  z-index: 5;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ===== CATEGORY SECTION ===== */
+.category-section {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.category-section.active { display: block; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-icon {
+  font-size: 1.5rem;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.section-desc {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-top: 0.2rem;
+}
+
+/* ===== Q&A CARDS ===== */
+.qa-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.qa-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.qa-card:hover { border-color: #484f58; }
+.qa-card.open { border-color: var(--green); }
+
+.qa-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.q-num {
+  font-size: 0.6rem;
+  color: var(--green);
+  font-weight: 600;
+  min-width: 2rem;
+  padding-top: 0.15rem;
+  letter-spacing: 0.05em;
+}
+
+.q-text {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.q-tags {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.q-tag {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+}
+
+.tag-basic { background: var(--green-dim); color: var(--green); }
+.tag-intermediate { background: var(--orange-dim); color: var(--orange); }
+.tag-advanced { background: #2d1b4e; color: var(--purple); }
+.tag-concept { background: var(--cyan-dim); color: var(--cyan); }
+
+.q-chevron {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  transition: transform 0.25s;
+  min-width: 1rem;
+  text-align: center;
+  padding-top: 0.1rem;
+}
+
+.qa-card.open .q-chevron { transform: rotate(180deg); color: var(--green); }
+
+.qa-answer {
+  display: none;
+  border-top: 1px solid var(--border);
+}
+
+.qa-card.open .qa-answer { display: block; }
+
+.answer-inner {
+  padding: 1.25rem 1.5rem;
+}
+
+.answer-text {
+  font-size: 0.78rem;
+  line-height: 2;
+  color: #cdd9e5;
+  margin-bottom: 1rem;
+}
+
+.answer-text strong { color: var(--green); font-weight: 600; }
+.answer-text em { color: var(--yellow); font-style: normal; }
+
+/* Example Block */
+.example-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cyan);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+}
+
+.example-header {
+  background: rgba(88,166,255,0.08);
+  padding: 0.4rem 1rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.example-body {
+  padding: 0.9rem 1rem;
+  font-size: 0.73rem;
+  line-height: 1.9;
+  color: #adbac7;
+}
+
+.example-body code {
+  background: rgba(255,255,255,0.06);
+  color: var(--orange);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
+
+/* Key Points */
+.key-points {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.key-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: #adbac7;
+}
+
+.key-point::before {
+  content: '▸';
+  color: var(--green);
+  min-width: 1rem;
+  padding-top: 0.05rem;
+}
+
+/* Comparison Table */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  font-size: 0.7rem;
+}
+
+.compare-table th {
+  background: rgba(63,185,80,0.1);
+  color: var(--green);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border);
+}
+
+.compare-table td {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border);
+  color: #adbac7;
+  line-height: 1.6;
+}
+
+.compare-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+/* ===== SEARCH RESULTS ===== */
+#search-results {
+  display: none;
+}
+
+#search-results.active { display: block; }
+
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  position: relative;
+  z-index: 5;
+  border-top: 1px solid var(--border);
+  max-width: 1100px;
+  margin: 3rem auto 0;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: gap;
+  gap: 1rem;
+}
+
+.footer-left {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.footer-right {
+  font-size: 0.65rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+@media (max-width: 640px) {
+  header, .search-wrap, main, footer { padding-left: 1rem; padding-right: 1rem; }
+  .nav-inner { padding: 0 1rem; }
+  .header-stats { gap: 1.25rem; }
+  .compare-table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">● Live · QA Interview Prep 2025</div>
+  <h1>The Tester's<br><span class="accent">Handbook</span> <span class="dim">/</span><br><span class="dim" style="font-size:60%">QA Interview Guide</span></h1>
+  <p class="header-desc">Everything a software tester needs to ace interviews — from fundamentals to advanced automation. Real questions, clear answers, practical examples.</p>
+  <div class="header-stats">
+    <div class="stat"><span class="stat-num">100+</span><span class="stat-label">Questions</span></div>
+    <div class="stat"><span class="stat-num">8</span><span class="stat-label">Categories</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">With Examples</span></div>
+    <div class="stat"><span class="stat-num">3</span><span class="stat-label">Difficulty Levels</span></div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search-input" placeholder="Search questions... e.g. 'regression', 'bug lifecycle'" autocomplete="off">
+  </div>
+  <div class="search-count" id="search-count"></div>
+</div>
+
+<nav class="nav-wrap">
+  <div class="nav-inner">
+    <button class="nav-tab active" data-cat="fundamentals">⚡ Fundamentals <span class="tab-count">18</span></button>
+    <button class="nav-tab" data-cat="sdlc">🔄 SDLC & STLC <span class="tab-count">12</span></button>
+    <button class="nav-tab" data-cat="types">🧪 Test Types <span class="tab-count">16</span></button>
+    <button class="nav-tab" data-cat="techniques">📐 Techniques <span class="tab-count">13</span></button>
+    <button class="nav-tab" data-cat="defects">🐛 Defects & Bugs <span class="tab-count">12</span></button>
+    <button class="nav-tab" data-cat="automation">🤖 Automation <span class="tab-count">13</span></button>
+    <button class="nav-tab" data-cat="agile">🏃 Agile & Scrum <span class="tab-count">11</span></button>
+    <button class="nav-tab" data-cat="api">🔌 API Testing <span class="tab-count">11</span></button>
+  </div>
+</nav>
+
+<main>
+<div id="search-results"></div>
+
+<!-- ===================== FUNDAMENTALS ===================== -->
+<div class="category-section active" data-cat="fundamentals">
+  <div class="section-header">
+    <span class="section-icon">⚡</span>
+    <div>
+      <div class="section-title">Fundamentals</div>
+      <div class="section-desc">Core QA concepts every tester must know cold</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is software testing and why is it important?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is software testing and why is it important?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Software testing is the process of <strong>evaluating a software application</strong> to identify differences between expected and actual behavior, and to verify that it meets the specified requirements. It ensures the product is <em>bug-free</em>, reliable, and delivers value to the end user.</p>
+        <div class="key-points">
+          <div class="key-point">Detects defects early — fixing bugs in production costs 10x more than fixing them in development</div>
+          <div class="key-point">Ensures quality, security, and performance before release</div>
+          <div class="key-point">Builds confidence in the product for stakeholders and end users</div>
+          <div class="key-point">Prevents financial and reputational damage from failures</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Real-World Example</div>
+          <div class="example-body">An e-commerce site launches without testing its checkout flow. Users can't complete purchases during a sale — the company loses $200K in an hour. If testing had been done, the bug would have been caught for $50 in developer time.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between Quality Assurance and Quality Control?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is the difference between Quality Assurance (QA) and Quality Control (QC)?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>QA (Quality Assurance)</strong> is process-oriented — it focuses on <em>preventing defects</em> by improving development processes. <strong>QC (Quality Control)</strong> is product-oriented — it focuses on <em>finding defects</em> in the finished product.</p>
+        <table class="compare-table">
+          <tr><th>Aspect</th><th>QA</th><th>QC</th></tr>
+          <tr><td>Focus</td><td>Process</td><td>Product</td></tr>
+          <tr><td>Goal</td><td>Prevent defects</td><td>Find defects</td></tr>
+          <tr><td>When</td><td>Throughout SDLC</td><td>After development</td></tr>
+          <tr><td>Who</td><td>Entire team</td><td>Test team</td></tr>
+          <tr><td>Example</td><td>Writing coding standards</td><td>Executing test cases</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is verification and validation in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What is Verification vs Validation? Explain with examples.</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Verification</strong> asks: <em>"Are we building the product right?"</em> — It checks documents, designs, and code without executing it. <strong>Validation</strong> asks: <em>"Are we building the right product?"</em> — It runs the actual software to check it meets user needs.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">
+            <strong>Verification:</strong> Reviewing the login page's design spec to confirm it includes a "forgot password" link before coding begins.<br><br>
+            <strong>Validation:</strong> Actually running the app and clicking "forgot password" to see if the reset email arrives correctly.
+          </div>
+        </div>
+        <div class="key-points">
+          <div class="key-point">Verification = static testing (reviews, walkthroughs, inspections)</div>
+          <div class="key-point">Validation = dynamic testing (actually running the software)</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are the 7 principles of software testing?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What are the 7 Principles of Software Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Testing shows presence of defects</strong> — Testing can prove bugs exist, but never prove software is 100% bug-free.</div>
+          <div class="key-point"><strong>Exhaustive testing is impossible</strong> — You can't test every possible input/scenario; prioritize by risk.</div>
+          <div class="key-point"><strong>Early testing saves money</strong> — The earlier a bug is found, the cheaper it is to fix.</div>
+          <div class="key-point"><strong>Defect clustering</strong> — 80% of defects are found in 20% of modules (Pareto Principle).</div>
+          <div class="key-point"><strong>Pesticide paradox</strong> — Running the same tests repeatedly stops finding new bugs; update your test suite regularly.</div>
+          <div class="key-point"><strong>Testing is context-dependent</strong> — A banking app needs different testing than a gaming app.</div>
+          <div class="key-point"><strong>Absence of errors fallacy</strong> — A bug-free app that doesn't meet user needs is still a failure.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is a test plan and what does it contain?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">What is a Test Plan? What does it contain?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A <strong>Test Plan</strong> is a formal document that describes the <em>scope, approach, resources, and schedule</em> for a testing effort. It serves as a blueprint for the entire testing process.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Scope:</strong> What will and won't be tested</div>
+          <div class="key-point"><strong>Objectives:</strong> Goals of the testing effort</div>
+          <div class="key-point"><strong>Test strategy:</strong> Approach, types of testing, tools</div>
+          <div class="key-point"><strong>Resources:</strong> Team members, environments, tools needed</div>
+          <div class="key-point"><strong>Schedule:</strong> Timelines, milestones, deadlines</div>
+          <div class="key-point"><strong>Entry/Exit criteria:</strong> When testing starts and ends</div>
+          <div class="key-point"><strong>Risk & mitigation:</strong> Known risks and contingency plans</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between test case and test scenario?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What is the difference between a Test Case and a Test Scenario?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A <strong>Test Scenario</strong> is a high-level description of <em>what</em> to test. A <strong>Test Case</strong> is a detailed, step-by-step description of <em>how</em> to test a specific scenario with exact inputs and expected results.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — Login Feature</div>
+          <div class="example-body">
+            <strong>Test Scenario:</strong> Verify that the login functionality works correctly.<br><br>
+            <strong>Test Case 1:</strong><br>
+            Steps: 1) Open login page 2) Enter valid email <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="314442544371455442451f525e5c">[email&#160;protected]</a></code> 3) Enter valid password <code>Pass@123</code> 4) Click Login<br>
+            Expected Result: User is redirected to the dashboard.<br><br>
+            <strong>Test Case 2:</strong><br>
+            Steps: 1) Open login page 2) Enter invalid email <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ddaaafb2b3ba9da5f3beb2b0">[email&#160;protected]</a></code> 3) Enter any password 4) Click Login<br>
+            Expected Result: Error message "Invalid credentials" is displayed.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are entry and exit criteria in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What are Entry and Exit Criteria in testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Entry Criteria</strong> are conditions that must be met <em>before</em> testing starts. <strong>Exit Criteria</strong> are conditions that must be met <em>before</em> testing ends and the product is declared ready for release.</p>
+        <table class="compare-table">
+          <tr><th>Entry Criteria (to START testing)</th><th>Exit Criteria (to STOP testing)</th></tr>
+          <tr><td>Requirements are finalized & approved</td><td>All planned test cases executed</td></tr>
+          <tr><td>Test environment is ready</td><td>No critical/high bugs open</td></tr>
+          <tr><td>Test data is prepared</td><td>Pass rate ≥ 95%</td></tr>
+          <tr><td>Build is deployed & stable</td><td>Test coverage goals met</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is traceability matrix RTM?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What is a Requirements Traceability Matrix (RTM)?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">An <strong>RTM</strong> is a document that maps every <em>requirement</em> to its corresponding <em>test cases</em>, ensuring complete test coverage and that no requirement is left untested.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example RTM</div>
+          <div class="example-body">
+            <code>REQ-001: User can log in</code> → TC01, TC02, TC03<br>
+            <code>REQ-002: Password reset via email</code> → TC04, TC05<br>
+            <code>REQ-003: Remember me for 30 days</code> → TC06<br><br>
+            If REQ-003 has no test cases, the RTM reveals this gap immediately.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is risk-based testing?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Risk-Based Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Risk-Based Testing</strong> prioritizes test cases based on the <em>likelihood</em> and <em>impact</em> of failures. High-risk areas get tested first and most thoroughly. This is crucial when time is limited.</p>
+        <div class="key-points">
+          <div class="key-point">Risk = Probability of failure × Impact of failure</div>
+          <div class="key-point">Payment processing (high risk) → test extensively first</div>
+          <div class="key-point">About Us page (low risk) → test minimally or last</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">For a banking app, you'd prioritize: fund transfer, account login, and balance display (high risk, high impact) over UI color themes and footer links (low risk, low impact).</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is test coverage and code coverage?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What is Test Coverage vs Code Coverage?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Test Coverage</strong> measures how much of the <em>requirements or features</em> are covered by tests. <strong>Code Coverage</strong> measures how much of the <em>actual source code</em> is executed during testing.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">
+            <strong>Test Coverage:</strong> If 40 out of 50 requirements have test cases → 80% test coverage.<br><br>
+            <strong>Code Coverage:</strong> If tests execute 800 out of 1000 lines of code → 80% code coverage.<br><br>
+            Tools for code coverage: <code>JaCoCo</code> (Java), <code>Istanbul/NYC</code> (JS), <code>Coverage.py</code> (Python)
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is shift left testing?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">What is Shift-Left Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Shift-Left Testing</strong> means moving testing activities <em>earlier</em> in the development lifecycle — to the left on the project timeline. Instead of testing only after code is written, you test during requirements, design, and development phases.</p>
+        <div class="key-points">
+          <div class="key-point">Review requirements before coding starts (catches ambiguity early)</div>
+          <div class="key-point">Developers write unit tests alongside code (TDD)</div>
+          <div class="key-point">QA reviews design documents, not just the final product</div>
+          <div class="key-point">Result: Bugs are 10–100x cheaper to fix</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is a test environment?">
+      <div class="qa-question">
+        <span class="q-num">Q12</span>
+        <div>
+          <div class="q-text">What is a Test Environment and what are the common types?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A <strong>Test Environment</strong> is the combination of hardware, software, network configuration, and data used to execute tests. It should closely mirror the production environment.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>DEV:</strong> Developer's local machine — first line of testing</div>
+          <div class="key-point"><strong>SIT (System Integration Test):</strong> All modules integrated and tested together</div>
+          <div class="key-point"><strong>UAT (User Acceptance Test):</strong> Business users validate the system</div>
+          <div class="key-point"><strong>Staging/Pre-prod:</strong> Mirror of production — final check before release</div>
+          <div class="key-point"><strong>Production:</strong> The live environment — monitored post-release</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between static and dynamic testing?">
+      <div class="qa-question">
+        <span class="q-num">Q13</span>
+        <div>
+          <div class="q-text">What is the difference between Static and Dynamic Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Static Testing</strong> examines the software <em>without executing it</em> — reviewing documents, code, and designs. <strong>Dynamic Testing</strong> involves <em>actually running</em> the software and observing its behaviour.</p>
+        <table class="compare-table">
+          <tr><th>Static Testing</th><th>Dynamic Testing</th></tr>
+          <tr><td>No code execution</td><td>Code is executed</td></tr>
+          <tr><td>Reviews, walkthroughs, inspections</td><td>Unit, integration, system tests</td></tr>
+          <tr><td>Done early in SDLC</td><td>Done after code is written</td></tr>
+          <tr><td>Finds requirement defects, code smells</td><td>Finds runtime, logic, performance bugs</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body"><strong>Static:</strong> Reviewing a requirements doc and finding that "user age" is never defined as a range.<br><strong>Dynamic:</strong> Running the registration form and finding it accepts age = -5.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is test data management?">
+      <div class="qa-question">
+        <span class="q-num">Q14</span>
+        <div>
+          <div class="q-text">What is Test Data Management and why does it matter?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Test Data Management (TDM)</strong> is the process of creating, maintaining, and managing data used in testing. Poor test data leads to inaccurate results, missed bugs, and compliance violations.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Synthetic data:</strong> Artificially generated data that mimics real data — safe to use, no privacy issues</div>
+          <div class="key-point"><strong>Masked/Anonymised data:</strong> Real production data with PII removed or scrambled</div>
+          <div class="key-point"><strong>Cloned data:</strong> Copy of production data used in staging environments</div>
+          <div class="key-point">Test data should cover: valid data, invalid data, boundary values, empty/null values</div>
+          <div class="key-point">Avoid using real customer data in test environments due to GDPR/privacy laws</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Testing a payment gateway requires card numbers. Use synthetic test card numbers like <code>4111 1111 1111 1111</code> (Stripe/Visa test card) — never real customer card data.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is ad hoc testing?">
+      <div class="qa-question">
+        <span class="q-num">Q15</span>
+        <div>
+          <div class="q-text">What is Ad Hoc Testing? When is it used?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Ad Hoc Testing</strong> is informal, unstructured testing done <em>without any test plan, test cases, or documentation</em>. The tester randomly explores the application to find bugs using intuition and experience.</p>
+        <div class="key-points">
+          <div class="key-point">No documentation — purely spontaneous</div>
+          <div class="key-point">Good for quickly checking a new build or finding obvious issues</div>
+          <div class="key-point">Buddy testing: two testers work together — one codes while the other tests</div>
+          <div class="key-point">Pair testing: a developer and tester work side-by-side</div>
+          <div class="key-point">Not repeatable — bugs found may be hard to reproduce</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 When to use it</div>
+          <div class="example-body">After a major release, a tester spends 30 minutes clicking around a new feature without following a script — finding an edge case where double-clicking "Submit" creates two orders.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between alpha and beta testing?">
+      <div class="qa-question">
+        <span class="q-num">Q16</span>
+        <div>
+          <div class="q-text">What is Alpha Testing vs Beta Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Alpha Testing</th><th>Beta Testing</th></tr>
+          <tr><td>Done at the developer's site</td><td>Done at the customer's site</td></tr>
+          <tr><td>Internal employees/QA team</td><td>Real end users (external)</td></tr>
+          <tr><td>Controlled environment</td><td>Real-world environment</td></tr>
+          <tr><td>Before beta release</td><td>Before final product launch</td></tr>
+          <tr><td>Bugs fixed immediately</td><td>Feedback collected and prioritised</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Google releases Gmail to internal employees first (Alpha). Then they open it to a limited set of external users via invite (Beta). Feedback from beta users shaped the final product before public launch.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are the qualities of a good test case?">
+      <div class="qa-question">
+        <span class="q-num">Q17</span>
+        <div>
+          <div class="q-text">What are the qualities of a good Test Case?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A good test case is one that can be understood, executed, and verified by <em>anyone</em> on the team — not just the person who wrote it.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Accurate:</strong> Tests exactly what it claims to test</div>
+          <div class="key-point"><strong>Clear &amp; concise:</strong> Steps are unambiguous; no interpretation needed</div>
+          <div class="key-point"><strong>Repeatable:</strong> Produces the same result every time it's run</div>
+          <div class="key-point"><strong>Traceable:</strong> Linked to a specific requirement or user story</div>
+          <div class="key-point"><strong>Self-contained:</strong> Doesn't depend on the outcome of another test case</div>
+          <div class="key-point"><strong>Has clear expected result:</strong> Pass/Fail is never ambiguous</div>
+          <div class="key-point"><strong>Maintainable:</strong> Easy to update when requirements change</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between positive and negative testing?">
+      <div class="qa-question">
+        <span class="q-num">Q18</span>
+        <div>
+          <div class="q-text">What is Positive vs Negative Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Positive Testing</strong> verifies the system works correctly with <em>valid, expected inputs</em> (the happy path). <strong>Negative Testing</strong> verifies the system handles <em>invalid, unexpected inputs</em> gracefully without crashing.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — Email field</div>
+          <div class="example-body">
+            <strong>Positive:</strong> Enter <code>user@example.com</code> → form submits successfully ✅<br><br>
+            <strong>Negative:</strong><br>
+            Enter <code>userexample.com</code> (no @) → error message shown ✅<br>
+            Enter <code>user@</code> (incomplete) → error message shown ✅<br>
+            Enter empty field → "Required field" error shown ✅<br>
+            Enter 500 characters → appropriate error or truncation ✅
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== SDLC & STLC ===================== -->
+<div class="category-section" data-cat="sdlc">
+  <div class="section-header">
+    <span class="section-icon">🔄</span>
+    <div>
+      <div class="section-title">SDLC & STLC</div>
+      <div class="section-desc">Software Development & Testing Life Cycle questions</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is SDLC and STLC? What are the phases?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is SDLC vs STLC? Explain the phases of each.</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>SDLC</strong> (Software Development Life Cycle) is the entire process of building software. <strong>STLC</strong> (Software Testing Life Cycle) is the testing subset within SDLC.</p>
+        <table class="compare-table">
+          <tr><th>SDLC Phases</th><th>STLC Phases</th></tr>
+          <tr><td>1. Requirements gathering</td><td>1. Requirement analysis</td></tr>
+          <tr><td>2. System design</td><td>2. Test planning</td></tr>
+          <tr><td>3. Implementation (coding)</td><td>3. Test case development</td></tr>
+          <tr><td>4. Testing</td><td>4. Test environment setup</td></tr>
+          <tr><td>5. Deployment</td><td>5. Test execution</td></tr>
+          <tr><td>6. Maintenance</td><td>6. Test closure</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the Waterfall model and what are its advantages and disadvantages?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is the Waterfall model? Pros and cons?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>Waterfall model</strong> is a linear, sequential approach where each phase must be completed before the next begins. Like a waterfall, you can't flow backwards.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Flow</div>
+          <div class="example-body">Requirements → Design → Coding → Testing → Deployment → Maintenance<br><br>Each phase produces a deliverable before the next phase begins.</div>
+        </div>
+        <div class="key-points">
+          <div class="key-point">✅ Simple, easy to understand and manage</div>
+          <div class="key-point">✅ Works well for projects with clear, fixed requirements</div>
+          <div class="key-point">❌ Testing happens late — bugs found are expensive to fix</div>
+          <div class="key-point">❌ No flexibility for changing requirements mid-project</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Agile model and how is testing done in Agile?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What is the Agile model? How does testing fit in?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Agile is an iterative approach where software is built and tested in short cycles called <strong>sprints</strong> (1–4 weeks). Testing happens <em>continuously alongside development</em>, not as a separate phase.</p>
+        <div class="key-points">
+          <div class="key-point">Testers collaborate daily with developers and product owners</div>
+          <div class="key-point">Test cases are written from user stories in the same sprint</div>
+          <div class="key-point">Regression suite grows sprint by sprint</div>
+          <div class="key-point">Continuous feedback and fast bug fixes are core to the process</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Sprint Workflow</div>
+          <div class="example-body">Sprint Planning → Development + Testing in parallel → Bug fixes → Sprint Review → Retrospective → Repeat</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is V-model in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What is the V-Model in testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>V-Model</strong> (Validation & Verification model) pairs each development phase with a corresponding testing phase. Development flows down the left side of the V; testing flows up the right side.</p>
+        <div class="example-block">
+          <div class="example-header">💡 V-Model Structure</div>
+          <div class="example-body">
+            Requirements Analysis ←→ Acceptance Testing (UAT)<br>
+            System Design ←→ System Testing<br>
+            Architecture Design ←→ Integration Testing<br>
+            Module Design ←→ Unit Testing<br>
+            ↓ CODING ↑
+          </div>
+        </div>
+        <div class="key-points">
+          <div class="key-point">Test planning begins at the same time as development — not after</div>
+          <div class="key-point">Every development phase has a corresponding test phase</div>
+          <div class="key-point">Great for projects where requirements are well-defined upfront</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are the phases of STLC in detail?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">Explain each phase of STLC in detail.</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>1. Requirement Analysis:</strong> Testers study requirements, identify testable items, and raise queries for ambiguities.</div>
+          <div class="key-point"><strong>2. Test Planning:</strong> Test Lead creates the Test Plan: scope, tools, team, timelines, risks.</div>
+          <div class="key-point"><strong>3. Test Case Development:</strong> Testers write detailed test cases and prepare test data.</div>
+          <div class="key-point"><strong>4. Test Environment Setup:</strong> Configure servers, databases, test tools, and access credentials.</div>
+          <div class="key-point"><strong>5. Test Execution:</strong> Execute test cases, log results, raise bugs, and track them to closure.</div>
+          <div class="key-point"><strong>6. Test Closure:</strong> Write test summary report, calculate metrics, archive artifacts, conduct retrospective.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is continuous integration and continuous testing CI CD?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What is CI/CD and how does testing fit into it?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>CI (Continuous Integration)</strong> means developers frequently merge code into a shared repository, triggering automated builds and tests. <strong>CD (Continuous Delivery/Deployment)</strong> automatically delivers tested code to staging or production.</p>
+        <div class="example-block">
+          <div class="example-header">💡 CI/CD Pipeline Example</div>
+          <div class="example-body">Developer pushes code → <code>GitHub</code> triggers <code>Jenkins/GitHub Actions</code> → Build runs → Unit tests auto-execute → Integration tests run → If all pass → Auto-deploy to staging → QA tests staging → Approve → Deploy to production</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is DevOps and QA's role in it?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What is DevOps and what is QA's role in it?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>DevOps</strong> is a culture combining Development and Operations to deliver software faster and more reliably. QA's role evolves from manual gatekeeper to <em>quality engineer</em> embedded in the pipeline.</p>
+        <div class="key-points">
+          <div class="key-point">QA writes automated tests that run in CI/CD pipelines</div>
+          <div class="key-point">QA monitors production metrics and logs (shift-right testing)</div>
+          <div class="key-point">QA contributes to infrastructure-as-code and environment automation</div>
+          <div class="key-point">Focus: Quality is everyone's responsibility, not just QA's</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the Spiral model in software development?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What is the Spiral Model? How does testing fit?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>Spiral Model</strong> combines iterative development with systematic risk analysis. Each loop of the spiral represents a phase with four quadrants: Planning → Risk Analysis → Engineering → Evaluation.</p>
+        <div class="key-points">
+          <div class="key-point">Risk-driven — each cycle assesses and mitigates the biggest risks first</div>
+          <div class="key-point">Testing happens at the end of every spiral loop</div>
+          <div class="key-point">Best for: large, complex, high-risk projects with evolving requirements</div>
+          <div class="key-point">Expensive — not suitable for small or short-term projects</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Building an air traffic control system: each spiral loop delivers a working prototype — tested, reviewed, then fed into the next cycle with lessons learned and risk mitigation applied.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is test closure and test summary report?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Test Closure? What goes in a Test Summary Report?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Test Closure</strong> is the final phase of STLC — wrapping up testing activities, archiving artefacts, and reporting results. The <strong>Test Summary Report</strong> is the key deliverable.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Test Summary Report includes:</strong></div>
+          <div class="key-point">Total test cases: written, executed, passed, failed, skipped</div>
+          <div class="key-point">Defects: total found, closed, deferred, open</div>
+          <div class="key-point">Test coverage achieved vs planned</div>
+          <div class="key-point">Risks and deviations from the test plan</div>
+          <div class="key-point">Sign-off recommendation: Go / No-Go for release</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is iterative and incremental development model?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What is Iterative vs Incremental Development?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Iterative</th><th>Incremental</th></tr>
+          <tr><td>Build full system, refine over cycles</td><td>Build and deliver in small pieces</td></tr>
+          <tr><td>Entire product redesigned each iteration</td><td>New features added each increment</td></tr>
+          <tr><td>Requirements can change</td><td>Requirements fixed per increment</td></tr>
+          <tr><td>Example: Prototyping model</td><td>Example: Feature-by-feature delivery</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Analogy</div>
+          <div class="example-body"><strong>Iterative:</strong> Sculpting a statue — you have the full shape from day one but refine it over multiple passes.<br><strong>Incremental:</strong> Building with LEGO — each session adds a complete new section.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between test strategy and test plan?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">What is the difference between Test Strategy and Test Plan?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Test Strategy</th><th>Test Plan</th></tr>
+          <tr><td>High-level, organisation-wide document</td><td>Project-specific document</td></tr>
+          <tr><td>Created by Test Manager/Director</td><td>Created by Test Lead</td></tr>
+          <tr><td>Defines testing approach across all projects</td><td>Defines testing approach for one project</td></tr>
+          <tr><td>Static — rarely changes</td><td>Dynamic — updated per project</td></tr>
+          <tr><td>No timelines or resources</td><td>Includes schedule, team, risks</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is shift right testing in production?">
+      <div class="qa-question">
+        <span class="q-num">Q12</span>
+        <div>
+          <div class="q-text">What is Shift-Right Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Shift-Right Testing</strong> extends quality activities <em>after</em> deployment — into production. It recognises that some issues only surface with real users and real data at scale.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>A/B Testing:</strong> Release two versions to different user groups, measure which performs better</div>
+          <div class="key-point"><strong>Canary Releases:</strong> Roll out to 1% of users first, monitor, then expand</div>
+          <div class="key-point"><strong>Feature Flags:</strong> Turn features on/off without redeploying code</div>
+          <div class="key-point"><strong>Production Monitoring:</strong> Track error rates, latency, and crashes in real-time using tools like <code>Datadog</code>, <code>Sentry</code>, <code>New Relic</code></div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== TEST TYPES ===================== -->
+<div class="category-section" data-cat="types">
+  <div class="section-header">
+    <span class="section-icon">🧪</span>
+    <div>
+      <div class="section-title">Test Types</div>
+      <div class="section-desc">All major types of testing explained with examples</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is functional vs non-functional testing?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is Functional vs Non-Functional Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Functional Testing</th><th>Non-Functional Testing</th></tr>
+          <tr><td>Tests WHAT the system does</td><td>Tests HOW WELL the system does it</td></tr>
+          <tr><td>Based on requirements</td><td>Based on quality attributes</td></tr>
+          <tr><td>Example: Login, Search, Checkout</td><td>Example: Load time, Security, Usability</td></tr>
+          <tr><td>Types: Unit, Integration, System, UAT</td><td>Types: Performance, Security, Compatibility</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body"><strong>Functional:</strong> "Does the search button return results?" <br><strong>Non-Functional:</strong> "Does the search return results in under 2 seconds when 10,000 users search simultaneously?"</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is smoke testing and sanity testing? What is the difference?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is Smoke Testing vs Sanity Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Smoke Testing</th><th>Sanity Testing</th></tr>
+          <tr><td>"Is the build testable at all?"</td><td>"Does this specific fix work?"</td></tr>
+          <tr><td>Broad, shallow — covers major features</td><td>Narrow, deep — focuses on changed area</td></tr>
+          <tr><td>Done first, on every new build</td><td>Done after a bug fix or small change</td></tr>
+          <tr><td>Done by testers</td><td>Done by testers (sometimes developers)</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body"><strong>Smoke:</strong> A new build arrives — check that app launches, login works, home page loads. If not → reject the build.<br><br><strong>Sanity:</strong> Bug fix for "price not displaying" is deployed → test price display thoroughly before full regression.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is regression testing and retesting? What is the difference?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What is Regression Testing vs Retesting?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Regression Testing</th><th>Retesting</th></tr>
+          <tr><td>Tests unaffected areas for side effects</td><td>Tests the exact bug that was fixed</td></tr>
+          <tr><td>"Did my fix break something else?"</td><td>"Is the reported bug now fixed?"</td></tr>
+          <tr><td>Uses existing test cases</td><td>Uses the original failed test case</td></tr>
+          <tr><td>Planned, broad scope</td><td>Targeted, narrow scope</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Bug: Payment fails for Visa cards. Fix deployed.<br><br><strong>Retesting:</strong> Try paying with a Visa card → confirm it now works.<br><strong>Regression:</strong> Also test Mastercard, PayPal, debit cards, refunds — ensure the fix didn't break anything else.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is UAT user acceptance testing?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What is UAT (User Acceptance Testing)?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>UAT</strong> is the final phase of testing where <em>actual end users or business stakeholders</em> validate the software against real-world business scenarios before go-live. It answers: "Does this meet our business needs?"</p>
+        <div class="key-points">
+          <div class="key-point">Done by business users, not QA engineers</div>
+          <div class="key-point">Uses real or realistic business data</div>
+          <div class="key-point">Tests end-to-end business workflows, not individual features</div>
+          <div class="key-point">Sign-off from UAT = green light for production deployment</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">For a payroll system, the HR manager runs UAT by processing the actual monthly payroll for a sample of employees — verifying tax calculations, deductions, and payslips are correct.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is performance testing load testing stress testing?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">What is Performance Testing? Explain Load, Stress, and Spike Testing.</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Performance Testing</strong> evaluates how a system behaves under expected and unexpected loads. Common tools: <code>JMeter</code>, <code>k6</code>, <code>Gatling</code>.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Load Testing:</strong> Test at expected user volumes. "Can we handle 1,000 users?"</div>
+          <div class="key-point"><strong>Stress Testing:</strong> Push beyond limits to find breaking point. "At what point does the system crash?"</div>
+          <div class="key-point"><strong>Spike Testing:</strong> Sudden, sharp increase in load. "What happens during a flash sale or viral traffic?"</div>
+          <div class="key-point"><strong>Soak Testing:</strong> Sustained load over a long period. "Does memory leak after 72 hours?"</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is security testing? What are common vulnerabilities?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What is Security Testing? What common vulnerabilities do you test for?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Security Testing</strong> identifies vulnerabilities that could allow unauthorized access, data theft, or system compromise. It ensures the system is protected from threats.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>SQL Injection:</strong> Entering SQL code in input fields to manipulate databases. <code>' OR 1=1--</code></div>
+          <div class="key-point"><strong>XSS (Cross-Site Scripting):</strong> Injecting malicious scripts into web pages viewed by others</div>
+          <div class="key-point"><strong>Authentication bypass:</strong> Accessing protected pages without proper login</div>
+          <div class="key-point"><strong>CSRF:</strong> Tricking users into performing unintended actions</div>
+          <div class="key-point"><strong>Sensitive data exposure:</strong> Passwords/cards stored in plain text</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Tool Examples</div>
+          <div class="example-body"><code>OWASP ZAP</code>, <code>Burp Suite</code>, <code>Nessus</code> — used for penetration testing and vulnerability scanning</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is exploratory testing?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What is Exploratory Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Exploratory Testing</strong> is simultaneous learning, test design, and test execution without predefined test cases. The tester explores the application using <em>experience, intuition, and curiosity</em> to find unexpected bugs.</p>
+        <div class="key-points">
+          <div class="key-point">Unscripted — no formal test cases, tester decides what to test in the moment</div>
+          <div class="key-point">Best for: new features, usability issues, edge cases</div>
+          <div class="key-point">Time-boxed sessions (e.g., 60–90 min) called "charters" keep it focused</div>
+          <div class="key-point">Finds bugs that scripted testing misses due to rigid test case design</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Charter Example</div>
+          <div class="example-body">"Explore the user registration flow with the goal of finding data validation issues — spend 60 minutes, try unusual inputs, edge cases, and unexpected navigation paths."</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is usability and accessibility testing?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What is Usability Testing vs Accessibility Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Usability Testing</th><th>Accessibility Testing</th></tr>
+          <tr><td>"Is it easy to use?"</td><td>"Can everyone use it?"</td></tr>
+          <tr><td>Efficiency, learnability, satisfaction</td><td>WCAG compliance, screen readers, keyboard nav</td></tr>
+          <tr><td>Real users complete tasks while observed</td><td>Automated + manual with assistive tools</td></tr>
+          <tr><td>Tool: UserTesting, Hotjar</td><td>Tool: axe, WAVE, NVDA, VoiceOver</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is compatibility testing and cross browser testing?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Compatibility / Cross-Browser Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Compatibility Testing</strong> verifies that software works correctly across different environments, devices, browsers, and OS versions.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Cross-browser:</strong> Test in Chrome, Firefox, Safari, Edge</div>
+          <div class="key-point"><strong>Cross-device:</strong> Desktop, tablet, mobile (iOS and Android)</div>
+          <div class="key-point"><strong>Cross-OS:</strong> Windows 10/11, macOS, Linux</div>
+          <div class="key-point">Tools: <code>BrowserStack</code>, <code>LambdaTest</code>, <code>Sauce Labs</code></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is unit integration system acceptance testing testing levels?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">Explain the 4 Levels of Testing (Unit → Integration → System → Acceptance)</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Unit Testing:</strong> Test individual functions/methods in isolation. Done by developers. E.g., testing a single <code>calculateTax()</code> function.</div>
+          <div class="key-point"><strong>Integration Testing:</strong> Test how modules work together. E.g., does the login module correctly pass the user ID to the dashboard module?</div>
+          <div class="key-point"><strong>System Testing:</strong> Test the entire application end-to-end as a whole system against all requirements.</div>
+          <div class="key-point"><strong>Acceptance Testing (UAT):</strong> Business users validate the software meets real-world business needs before go-live.</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Analogy</div>
+          <div class="example-body">Building a car: Unit = test each engine part. Integration = test engine + transmission together. System = test the whole car. Acceptance = customer takes it for a test drive.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is end to end testing E2E testing?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">What is End-to-End (E2E) Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>E2E Testing</strong> validates complete user workflows from start to finish across all integrated systems — frontend, backend, database, and external services — simulating real user behaviour.</p>
+        <div class="key-points">
+          <div class="key-point">Tests the entire application stack, not just one layer</div>
+          <div class="key-point">Detects integration issues between systems that unit tests miss</div>
+          <div class="key-point">Slowest and most expensive — use sparingly for critical flows</div>
+          <div class="key-point">Tools: <code>Playwright</code>, <code>Cypress</code>, <code>Selenium</code></div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example — E-commerce E2E</div>
+          <div class="example-body">User registers → logs in → searches for a product → adds to cart → applies discount code → checks out → pays via Stripe → receives confirmation email → order appears in admin panel. One complete flow covering all layers.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is mutation testing?">
+      <div class="qa-question">
+        <span class="q-num">Q12</span>
+        <div>
+          <div class="q-text">What is Mutation Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Mutation Testing</strong> evaluates the quality of your test suite by deliberately introducing small code changes ("mutations") and checking whether your tests catch them. If a mutation survives undetected, your tests have a gap.</p>
+        <div class="key-points">
+          <div class="key-point">A mutant is a small code change: <code>&gt;</code> becomes <code>&gt;=</code>, <code>+</code> becomes <code>-</code></div>
+          <div class="key-point">If all tests still pass after mutation → tests are weak ("mutant survived")</div>
+          <div class="key-point">If a test fails after mutation → tests caught it ("mutant killed") ✅</div>
+          <div class="key-point">Tools: <code>PIT</code> (Java), <code>Stryker</code> (JS/TS), <code>mutmut</code> (Python)</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is volume testing and scalability testing?">
+      <div class="qa-question">
+        <span class="q-num">Q13</span>
+        <div>
+          <div class="q-text">What is Volume Testing vs Scalability Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Volume Testing</th><th>Scalability Testing</th></tr>
+          <tr><td>"Can it handle large amounts of data?"</td><td>"Does it scale gracefully as load grows?"</td></tr>
+          <tr><td>Focus on database/data volume</td><td>Focus on throughput and capacity growth</td></tr>
+          <tr><td>Insert 10M records — does the app slow down?</td><td>Go from 100 to 10,000 users — does response time stay stable?</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body"><strong>Volume:</strong> A reporting tool is tested with a database containing 50 million rows — verifying it generates reports without timing out.<br><br><strong>Scalability:</strong> Doubling the server capacity should double the throughput — test whether the system scales linearly.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is installation testing and configuration testing?">
+      <div class="qa-question">
+        <span class="q-num">Q14</span>
+        <div>
+          <div class="q-text">What is Installation Testing and Configuration Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Installation Testing</strong> verifies that the software installs, upgrades, and uninstalls correctly across all supported environments. <strong>Configuration Testing</strong> checks behaviour across different hardware/software settings.</p>
+        <div class="key-points">
+          <div class="key-point">Installation test: fresh install, upgrade from v1 → v2, rollback, silent install</div>
+          <div class="key-point">Configuration test: different screen resolutions, different OS language settings, different network speeds</div>
+          <div class="key-point">Critical for desktop applications, mobile apps, and embedded software</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is reliability and recovery testing?">
+      <div class="qa-question">
+        <span class="q-num">Q15</span>
+        <div>
+          <div class="q-text">What is Reliability Testing vs Recovery Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Reliability Testing</strong> measures how consistently a system performs its required functions over time. <strong>Recovery Testing</strong> tests how well the system recovers from crashes, failures, or disasters.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Reliability:</strong> Run the system continuously for 72 hours — track failure rate and MTBF (Mean Time Between Failures)</div>
+          <div class="key-point"><strong>Recovery:</strong> Kill the database mid-transaction — does the app recover data correctly?</div>
+          <div class="key-point"><strong>Recovery:</strong> Pull the network cable — does the app reconnect and resume gracefully?</div>
+          <div class="key-point">Disaster Recovery (DR) testing: simulate a full server outage and verify backup systems activate within RTO/RPO targets</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is localisation and internationalisation testing l10n i18n?">
+      <div class="qa-question">
+        <span class="q-num">Q16</span>
+        <div>
+          <div class="q-text">What is Localisation (L10n) vs Internationalisation (I18n) Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>I18n (Internationalisation)</th><th>L10n (Localisation)</th></tr>
+          <tr><td>Design supports multiple locales</td><td>Content adapted for a specific locale</td></tr>
+          <tr><td>Date formats, currency, text direction</td><td>Language translation, local idioms</td></tr>
+          <tr><td>Does layout handle Arabic (RTL) text?</td><td>Is the French translation accurate?</td></tr>
+          <tr><td>Does UI expand for German long words?</td><td>Are date formats correct for Japan?</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Common Bugs Found</div>
+          <div class="example-body">Price showing <code>$1,000.00</code> in Germany where the convention is <code>1.000,00 €</code>. Or a "Submit" button label in German ("Absenden") causing the button to overflow its container.</div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== TECHNIQUES ===================== -->
+<div class="category-section" data-cat="techniques">
+  <div class="section-header">
+    <span class="section-icon">📐</span>
+    <div>
+      <div class="section-title">Test Design Techniques</div>
+      <div class="section-desc">How to design effective test cases systematically</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is equivalence partitioning?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is Equivalence Partitioning? How is it used?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Equivalence Partitioning</strong> divides input data into partitions where all values in a partition are expected to behave the same way. You test one value from each partition instead of testing every possible value — reducing test cases while maintaining coverage.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — Age field (valid: 18–60)</div>
+          <div class="example-body">
+            <strong>Invalid partition 1:</strong> Below 18 → test with <code>15</code><br>
+            <strong>Valid partition:</strong> 18–60 → test with <code>35</code><br>
+            <strong>Invalid partition 2:</strong> Above 60 → test with <code>65</code><br><br>
+            Instead of testing all 60+ valid ages, you test just 3 representative values.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is boundary value analysis BVA?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is Boundary Value Analysis (BVA)?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>BVA</strong> tests values at the edges (boundaries) of equivalence partitions because defects are most likely to occur at the boundaries, not in the middle. Test at: minimum, minimum+1, maximum-1, maximum, and just outside.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — Password length (6–12 characters)</div>
+          <div class="example-body">
+            <code>5 chars</code> → Invalid (below min) ❌<br>
+            <code>6 chars</code> → Valid (minimum) ✅<br>
+            <code>7 chars</code> → Valid (min+1) ✅<br>
+            <code>11 chars</code> → Valid (max-1) ✅<br>
+            <code>12 chars</code> → Valid (maximum) ✅<br>
+            <code>13 chars</code> → Invalid (above max) ❌
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is decision table testing?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What is Decision Table Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Decision Table Testing</strong> is used when system behavior depends on multiple conditions simultaneously. A table maps all combinations of conditions to their expected outcomes.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — Discount logic</div>
+          <div class="example-body">
+            <code>Member + Coupon → 30% off</code><br>
+            <code>Member + No Coupon → 10% off</code><br>
+            <code>Not Member + Coupon → 20% off</code><br>
+            <code>Not Member + No Coupon → No discount</code><br><br>
+            Each row is a test case. All logical combinations are covered.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is state transition testing?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What is State Transition Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>State Transition Testing</strong> tests how the system transitions between different states in response to events. Ideal for systems with defined states and workflows.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — ATM login</div>
+          <div class="example-body">
+            State: <code>IDLE</code> → Insert card → <code>CARD_INSERTED</code><br>
+            Enter correct PIN → <code>AUTHENTICATED</code><br>
+            Enter wrong PIN (3x) → <code>CARD_BLOCKED</code><br>
+            Enter correct PIN after block → Still <code>BLOCKED</code> (test this!)<br><br>
+            Test cases cover each valid transition AND invalid transitions.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is pairwise testing or all-pairs testing?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">What is Pairwise (All-Pairs) Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Pairwise Testing</strong> ensures every possible pair of parameter values is tested at least once. Research shows most bugs are caused by interactions between 2 parameters — making pairwise testing very efficient.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">
+            Parameters: Browser (Chrome, Firefox), OS (Win, Mac), Language (EN, FR)<br>
+            Full combinations: 2×2×2 = <code>8 tests</code><br>
+            Pairwise covers all pairs with only <code>4 tests</code> — 50% reduction, near-same coverage.<br><br>
+            Tool: <code>PICT</code> by Microsoft generates pairwise test cases automatically.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is black box white box and grey box testing?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What is Black Box vs White Box vs Grey Box Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Type</th><th>Internal Knowledge</th><th>Who</th><th>Example</th></tr>
+          <tr><td>Black Box</td><td>None — only input/output</td><td>QA Testers</td><td>Test login without seeing code</td></tr>
+          <tr><td>White Box</td><td>Full code access</td><td>Developers</td><td>Test every code path/branch</td></tr>
+          <tr><td>Grey Box</td><td>Partial (DB, APIs)</td><td>QA + Dev</td><td>Test with DB knowledge but no code</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is error guessing in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What is Error Guessing?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Error Guessing</strong> is a technique where testers use their <em>experience and intuition</em> to anticipate where defects are likely to occur — and write test cases specifically targeting those areas. It's informal but highly effective.</p>
+        <div class="key-points">
+          <div class="key-point">Leave required fields blank — what happens?</div>
+          <div class="key-point">Enter 0, negative numbers, or extremely large values</div>
+          <div class="key-point">Enter special characters: <code>!@#$%^&*</code>, emojis, SQL, HTML</div>
+          <div class="key-point">Double-click submit buttons, refresh mid-transaction</div>
+          <div class="key-point">Paste extremely long text into short input fields</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is use case testing?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What is Use Case Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Use Case Testing</strong> derives test cases directly from use cases — the documented interactions between a user and the system. It ensures the system supports real user workflows end-to-end.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example — "Place an Order" Use Case</div>
+          <div class="example-body">
+            <strong>Main flow (happy path):</strong> Browse → Add to cart → Checkout → Pay → Confirm<br>
+            <strong>Alternate flow:</strong> Item out of stock → Suggest similar<br>
+            <strong>Exception flow:</strong> Payment declined → Show error, keep cart intact
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is cause-effect graphing in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Cause-Effect Graphing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Cause-Effect Graphing</strong> is a systematic technique that translates natural language requirements into a graph linking <em>causes</em> (input conditions) to <em>effects</em> (output actions). It generates an optimised set of test cases from the graph.</p>
+        <div class="key-points">
+          <div class="key-point">Causes are input conditions: "user is logged in", "coupon code is valid"</div>
+          <div class="key-point">Effects are outputs: "show discount", "show error", "redirect to dashboard"</div>
+          <div class="key-point">The graph captures AND/OR/NOT relationships between conditions</div>
+          <div class="key-point">Each path through the graph = one test case — ensures all combinations are tested</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Simplified Example</div>
+          <div class="example-body">Cause 1: User is a member. Cause 2: Basket total &gt; £50.<br>Effect: Apply free shipping IF (C1 AND C2).<br>→ Test cases: both true, only C1, only C2, neither.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is path testing and basis path testing?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What is Basis Path Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Basis Path Testing</strong> (Tom McCabe) is a white-box technique that guarantees every independent path through the code is executed at least once. The number of independent paths = <strong>Cyclomatic Complexity</strong>.</p>
+        <div class="key-points">
+          <div class="key-point">Cyclomatic Complexity = Edges − Nodes + 2 (from the control flow graph)</div>
+          <div class="key-point">A complexity of 5 means 5 independent paths and 5 minimum test cases needed</div>
+          <div class="key-point">Higher complexity = more test cases needed = more risky code</div>
+          <div class="key-point">CC &gt; 10 is considered high risk — refactor the code</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">A function with 3 if-statements has a cyclomatic complexity of 4. You need at least 4 test cases to cover all independent logic paths through that function.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is checklist based testing?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">What is Checklist-Based Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Checklist-Based Testing</strong> uses a predefined list of conditions or items to verify during testing. It's quick, consistent, and ideal for repetitive checks or when test cases are too high-level.</p>
+        <div class="key-points">
+          <div class="key-point">Common for UI/UX checks, security reviews, and cross-browser validation</div>
+          <div class="key-point">Ensures nothing important is forgotten across test runs</div>
+          <div class="key-point">Easier to create and maintain than formal test cases</div>
+          <div class="key-point">Less detailed — may miss edge cases without supplementary techniques</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 UI Checklist Example</div>
+          <div class="example-body">
+            ☐ All buttons have hover states<br>
+            ☐ Error messages are displayed in red<br>
+            ☐ Tab order follows logical flow<br>
+            ☐ All images have alt text<br>
+            ☐ Form clears after successful submission
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is orthogonal array testing OATS?">
+      <div class="qa-question">
+        <span class="q-num">Q12</span>
+        <div>
+          <div class="q-text">What is Orthogonal Array Testing (OATS)?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>OATS</strong> is a systematic statistical method for testing combinations of parameters using orthogonal arrays (Latin squares). It provides maximum coverage with minimum test cases — even more efficient than pairwise testing.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Testing a form with 4 fields each having 3 options = 81 combinations.<br>An orthogonal array reduces this to just <strong>9 test cases</strong> while still covering all factor interactions at least once.<br><br>Tools: Minitab, Taguchi method tables.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you decide which test design technique to use?">
+      <div class="qa-question">
+        <span class="q-num">Q13</span>
+        <div>
+          <div class="q-text">How do you decide WHICH test design technique to use?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Choosing the right technique depends on the <em>type of input</em>, <em>complexity of logic</em>, and <em>available time</em>. Most experienced testers combine multiple techniques.</p>
+        <table class="compare-table">
+          <tr><th>Situation</th><th>Best Technique</th></tr>
+          <tr><td>Input fields with ranges</td><td>BVA + Equivalence Partitioning</td></tr>
+          <tr><td>Multiple conditions affecting output</td><td>Decision Table</td></tr>
+          <tr><td>System with defined states/workflows</td><td>State Transition</td></tr>
+          <tr><td>Many parameter combinations</td><td>Pairwise / OATS</td></tr>
+          <tr><td>End-user workflows</td><td>Use Case Testing</td></tr>
+          <tr><td>Code logic paths</td><td>Basis Path / White Box</td></tr>
+          <tr><td>Experience/intuition-driven</td><td>Error Guessing / Exploratory</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== DEFECTS ===================== -->
+<div class="category-section" data-cat="defects">
+  <div class="section-header">
+    <span class="section-icon">🐛</span>
+    <div>
+      <div class="section-title">Defects & Bug Management</div>
+      <div class="section-desc">How to find, report, track, and manage bugs professionally</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is a defect bug error failure in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is the difference between a Defect, Bug, Error, and Failure?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span><span class="q-tag tag-concept">Concept</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Error:</strong> A human mistake made by a developer while writing code. (Source: the human)</div>
+          <div class="key-point"><strong>Defect/Bug:</strong> The error introduced into the code. (Source: the code)</div>
+          <div class="key-point"><strong>Failure:</strong> When the defect causes the system to behave incorrectly at runtime. (Source: execution)</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Developer types <code>price * 1.1</code> instead of <code>price * 0.9</code> for a 10% discount. This <strong>error</strong> creates a <strong>defect</strong> in the code. When a user applies a discount coupon and gets charged MORE instead of less, that's a <strong>failure</strong>.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the defect life cycle or bug life cycle?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is the Defect Life Cycle (Bug Life Cycle)?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>Defect Life Cycle</strong> is the series of stages a bug goes through from discovery to closure.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Bug States Flow</div>
+          <div class="example-body">
+            <code>New</code> → Tester logs bug<br>
+            <code>Assigned</code> → Bug manager assigns to developer<br>
+            <code>Open</code> → Developer starts working on it<br>
+            <code>Fixed</code> → Developer fixes and marks as fixed<br>
+            <code>Retest</code> → Tester retests the fix<br>
+            <code>Closed</code> → Fix verified ✅ OR<br>
+            <code>Reopened</code> → Fix didn't work, cycle restarts 🔄<br>
+            <code>Deferred</code> → Valid bug, fixed in a later release<br>
+            <code>Rejected</code> → Not a bug (as per design / duplicate)
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you write a good bug report?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">How do you write a good Bug Report?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A good bug report allows a developer to <em>reproduce, understand, and fix</em> the issue without needing to ask the tester questions.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Title:</strong> Clear, specific summary. "Login fails with valid credentials on Firefox v120" not "Login broken"</div>
+          <div class="key-point"><strong>Environment:</strong> OS, browser, app version, test data used</div>
+          <div class="key-point"><strong>Steps to Reproduce:</strong> Numbered, exact steps anyone can follow</div>
+          <div class="key-point"><strong>Expected Result:</strong> What should have happened</div>
+          <div class="key-point"><strong>Actual Result:</strong> What actually happened</div>
+          <div class="key-point"><strong>Severity & Priority:</strong> How bad is it? How urgently must it be fixed?</div>
+          <div class="key-point"><strong>Attachments:</strong> Screenshots, screen recordings, logs</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is severity and priority of a defect?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What is Severity vs Priority in bug reporting?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Severity</strong> = technical impact on the system. <strong>Priority</strong> = business urgency — how quickly must it be fixed?</p>
+        <table class="compare-table">
+          <tr><th>Scenario</th><th>Severity</th><th>Priority</th></tr>
+          <tr><td>App crashes on checkout</td><td>Critical</td><td>High</td></tr>
+          <tr><td>CEO's name misspelled on About page</td><td>Low</td><td>High</td></tr>
+          <tr><td>Memory leak after 12 hours (rare)</td><td>High</td><td>Low</td></tr>
+          <tr><td>Tooltip text slightly misaligned</td><td>Low</td><td>Low</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What tools are used for bug tracking defect management?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">What tools are used for Bug Tracking / Test Management?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Jira:</strong> Most widely used. Integrates with dev tools, supports Agile boards, customizable workflows.</div>
+          <div class="key-point"><strong>Bugzilla:</strong> Open-source, classic tool, used in many enterprises.</div>
+          <div class="key-point"><strong>Azure DevOps:</strong> Microsoft ecosystem, test plans built in.</div>
+          <div class="key-point"><strong>TestRail:</strong> Dedicated test management (test cases + execution tracking).</div>
+          <div class="key-point"><strong>Zephyr / Xray:</strong> Jira plugins for test management within Jira.</div>
+          <div class="key-point"><strong>Linear, Trello, GitHub Issues:</strong> Lightweight options for smaller teams.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What would you do if a developer says your bug is not a bug?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What do you do if a developer says "That's not a bug, it's a feature"?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">This is a behavioral question testing your <em>communication and conflict resolution</em> skills. Never argue emotionally — let the requirements speak.</p>
+        <div class="key-points">
+          <div class="key-point">Reference the requirements document — show what was specified</div>
+          <div class="key-point">If requirements are ambiguous, escalate to the Product Owner/BA for clarification</div>
+          <div class="key-point">If no written requirement exists, discuss expected user experience</div>
+          <div class="key-point">Document the discussion outcome regardless of the decision</div>
+          <div class="key-point">Stay professional — the goal is quality, not winning arguments</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is a showstopper bug? What do you do when you find one?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What is a Showstopper bug and what action do you take?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A <strong>showstopper</strong> (blocker) is a critical defect that completely prevents testing from continuing or makes a core feature unusable. It must be fixed before testing can proceed.</p>
+        <div class="key-points">
+          <div class="key-point">Immediately log the bug with Critical severity and High priority</div>
+          <div class="key-point">Notify the dev lead and test manager right away (don't just log it silently)</div>
+          <div class="key-point">Document exactly which test cases are blocked</div>
+          <div class="key-point">Move to test other unblocked areas while the fix is being applied</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is defect density and how is it calculated?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What is Defect Density and how is it calculated?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Defect Density</strong> is the number of defects found per unit of software size (usually per 1,000 lines of code or per function point). It helps identify which modules need more attention.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Formula:</strong> Defect Density = Total Defects / Size of Software (KLoC)</div>
+          <div class="key-point">Industry average: 1–25 defects per 1,000 lines of code (depending on domain)</div>
+          <div class="key-point">High defect density in a module = risky area, needs more testing</div>
+          <div class="key-point">Tracks quality trends across releases and sprints</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">Module A has 50 defects in 5,000 lines of code → Density = 10 defects/KLoC.<br>Module B has 5 defects in 5,000 lines → Density = 1 defect/KLoC.<br>Module A needs more regression coverage and possibly a code review.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is root cause analysis RCA for defects?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Root Cause Analysis (RCA) and why do testers perform it?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Root Cause Analysis</strong> is the process of identifying the <em>underlying reason</em> a defect occurred — not just fixing the symptom, but preventing recurrence.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>5 Whys technique:</strong> Ask "Why?" five times to drill down to the root cause</div>
+          <div class="key-point"><strong>Fishbone diagram:</strong> Map possible causes across categories (People, Process, Tools, Environment)</div>
+          <div class="key-point">Outcome: Process improvements, new test cases, updated checklists</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 5 Whys Example</div>
+          <div class="example-body">
+            Bug: Payment failed in production.<br>
+            Why? → API returned a 500 error.<br>
+            Why? → The new tax calculation field was NULL.<br>
+            Why? → The DB migration didn't add a default value.<br>
+            Why? → Migration wasn't reviewed by QA.<br>
+            Why? → No process existed for QA to review DB migrations.<br>
+            <strong>Root cause:</strong> Missing process → Fix: Add DB migration review to Definition of Done.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is defect leakage and defect slippage?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What is Defect Leakage and Defect Slippage?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Defect Leakage</th><th>Defect Slippage</th></tr>
+          <tr><td>Bug missed in testing, found in production</td><td>Bug found but not fixed in the current release</td></tr>
+          <tr><td>Measures QA effectiveness</td><td>Measures deferred/postponed bugs</td></tr>
+          <tr><td>Formula: (Bugs in prod / Total bugs) × 100</td><td>Bug moved to next sprint/release</td></tr>
+          <tr><td>Goal: as close to 0% as possible</td><td>Managed via prioritisation</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">QA found 95 bugs in testing. 5 more were found after production release.<br><strong>Defect Leakage</strong> = 5/(95+5) × 100 = <strong>5%</strong>.<br>Industry benchmark: aim for &lt;5% leakage rate.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you prioritise which bugs to fix first?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">How do you prioritise which bugs to fix first?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Bug prioritisation is a collaborative decision involving QA, developers, and the Product Owner. It considers both technical severity and business impact.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Fix first:</strong> Critical severity + High priority (crashes, data loss, security vulnerabilities, blocking core flows)</div>
+          <div class="key-point"><strong>Fix next:</strong> High severity bugs affecting major features regularly used</div>
+          <div class="key-point"><strong>Schedule:</strong> Medium severity bugs — in upcoming sprint based on bandwidth</div>
+          <div class="key-point"><strong>Defer:</strong> Low severity, cosmetic issues with low user impact</div>
+          <div class="key-point">Release deadline proximity increases priority for all open bugs</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What information is needed to reproduce a bug?">
+      <div class="qa-question">
+        <span class="q-num">Q12</span>
+        <div>
+          <div class="q-text">What makes a bug hard to reproduce and how do you handle it?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Some bugs are <strong>intermittent</strong> — they don't occur every time. These are the hardest to investigate and fix.</p>
+        <div class="key-points">
+          <div class="key-point">Document the exact steps, environment, time, and test data when it first occurred</div>
+          <div class="key-point">Check application and server logs for that timestamp — logs often reveal the cause</div>
+          <div class="key-point">Try to reproduce under different conditions: different data, different load, different browser</div>
+          <div class="key-point">Record your screen during exploratory testing so intermittent bugs are captured</div>
+          <div class="key-point">Log it anyway with "Intermittent" tag — patterns often emerge over multiple occurrences</div>
+          <div class="key-point">Never mark an intermittent bug as "Cannot Reproduce" and close it without investigation</div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== AUTOMATION ===================== -->
+<div class="category-section" data-cat="automation">
+  <div class="section-header">
+    <span class="section-icon">🤖</span>
+    <div>
+      <div class="section-title">Test Automation</div>
+      <div class="section-desc">Automation frameworks, tools, and best practices</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is test automation and when should you automate?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is Test Automation? When should you automate vs test manually?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Test Automation</strong> uses code and tools to execute test cases automatically, replacing manual repetitive testing. Not everything should be automated.</p>
+        <div class="key-points">
+          <div class="key-point">✅ Automate: Regression tests, smoke tests, repetitive data-driven tests, performance tests</div>
+          <div class="key-point">✅ Automate: Stable features that won't change frequently</div>
+          <div class="key-point">❌ Don't automate: Exploratory, one-time tests, frequently-changing UI</div>
+          <div class="key-point">❌ Don't automate: Usability testing, UX judgment calls</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Rule of Thumb</div>
+          <div class="example-body">If a test will be run 10+ times and takes 10+ minutes manually, automate it. The break-even point is usually within the first few sprints.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Selenium and how does it work?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is Selenium WebDriver? How does it work?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Selenium WebDriver</strong> is an open-source framework for automating web browser interactions. It directly communicates with browsers using their native support, simulating real user actions.</p>
+        <div class="key-points">
+          <div class="key-point">Supports: Chrome, Firefox, Safari, Edge</div>
+          <div class="key-point">Languages: Java, Python, C#, JavaScript, Ruby</div>
+          <div class="key-point">Locators: <code>id</code>, <code>name</code>, <code>XPath</code>, <code>CSS Selector</code>, <code>className</code></div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Basic Python Example</div>
+          <div class="example-body">
+            <code>driver = webdriver.Chrome()</code><br>
+            <code>driver.get("https://example.com/login")</code><br>
+            <code>driver.find_element(By.ID, "username").send_keys("admin")</code><br>
+            <code>driver.find_element(By.ID, "password").send_keys("pass123")</code><br>
+            <code>driver.find_element(By.ID, "loginBtn").click()</code><br>
+            <code>assert "Dashboard" in driver.title</code>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the Page Object Model POM design pattern in automation?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What is the Page Object Model (POM)? Why is it used?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>POM</strong> is a design pattern where each web page in the application gets its own class containing all its UI elements (locators) and actions (methods). Tests interact with these page classes, not raw locators.</p>
+        <div class="key-points">
+          <div class="key-point">Separates test logic from UI locators — if a locator changes, update one class, not 50 tests</div>
+          <div class="key-point">Makes tests more readable: <code>loginPage.enterEmail("<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1f6a6c7a6d5f6b7a6c6b317c7072">[email&#160;protected]</a>")</code></div>
+          <div class="key-point">Promotes code reuse — the same page object used in multiple tests</div>
+          <div class="key-point">Easier to maintain as the application evolves</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Structure</div>
+          <div class="example-body">
+            <code>LoginPage.py</code> → stores locators + login(), enterEmail(), enterPassword()<br>
+            <code>test_login.py</code> → imports LoginPage and calls its methods<br><br>
+            When the username field ID changes from <code>user</code> to <code>email</code>, you fix it only in <code>LoginPage.py</code>.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are the different types of automation testing frameworks?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What are the types of Automation Frameworks?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Linear/Record & Playback:</strong> Record actions, play back. Simple but brittle. (e.g., Selenium IDE)</div>
+          <div class="key-point"><strong>Data-Driven:</strong> Test logic is fixed; test data comes from external files (Excel, CSV). Run same test with 100 data sets.</div>
+          <div class="key-point"><strong>Keyword-Driven:</strong> Actions described as keywords (CLICK, TYPE, VERIFY) in a table. Non-coders can write tests.</div>
+          <div class="key-point"><strong>Hybrid:</strong> Combination of Data-Driven + Keyword-Driven. Most common in enterprise.</div>
+          <div class="key-point"><strong>BDD (Behavior-Driven):</strong> Tests written in plain English (Gherkin). Tools: Cucumber, Behave, SpecFlow.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is BDD behavior driven development and Cucumber?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">What is BDD and how does Cucumber work?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>BDD</strong> (Behavior-Driven Development) writes tests as human-readable scenarios using <strong>Gherkin</strong> syntax (Given/When/Then). <strong>Cucumber</strong> maps these scenarios to actual code.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Gherkin Example — login.feature</div>
+          <div class="example-body">
+            <code>Feature: User Login</code><br><br>
+            <code>Scenario: Successful login with valid credentials</code><br>
+            <code>&nbsp;&nbsp;Given I am on the login page</code><br>
+            <code>&nbsp;&nbsp;When I enter email "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="740107110634001107005a171b19">[email&#160;protected]</a>" and password "Pass@123"</code><br>
+            <code>&nbsp;&nbsp;And I click the Login button</code><br>
+            <code>&nbsp;&nbsp;Then I should see the Dashboard page</code><br><br>
+            Business analysts can write these. Developers implement the step definitions in Java/Python.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What automation tools do you know for mobile web API?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What automation tools do you know for Web, Mobile, and API?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Category</th><th>Tools</th></tr>
+          <tr><td>Web UI</td><td>Selenium, Playwright, Cypress, TestCafe</td></tr>
+          <tr><td>Mobile</td><td>Appium, Espresso (Android), XCUITest (iOS), Detox</td></tr>
+          <tr><td>API</td><td>Postman, RestAssured, Karate, SoapUI</td></tr>
+          <tr><td>Performance</td><td>JMeter, k6, Gatling, Locust</td></tr>
+          <tr><td>Unit Testing</td><td>JUnit, TestNG, PyTest, NUnit, Jest</td></tr>
+          <tr><td>CI/CD</td><td>Jenkins, GitHub Actions, GitLab CI, Azure DevOps</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the test automation pyramid?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What is the Test Automation Pyramid?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>Automation Pyramid</strong> (Mike Cohn) guides how to balance automation investment across levels: more at the bottom (fast, cheap), less at the top (slow, expensive).</p>
+        <div class="example-block">
+          <div class="example-header">💡 Pyramid Levels</div>
+          <div class="example-body">
+            🔺 Top — <strong>E2E/UI Tests (10%)</strong> — Slow, brittle, expensive. Test core user journeys only.<br>
+            🔷 Middle — <strong>Integration Tests (20%)</strong> — APIs, services, module interactions.<br>
+            🟩 Base — <strong>Unit Tests (70%)</strong> — Fast, cheap, hundreds of tests. Strong foundation.
+          </div>
+        </div>
+        <div class="key-points">
+          <div class="key-point">An "ice cream cone" (top-heavy) anti-pattern: too many UI tests, not enough unit tests = slow, flaky pipeline</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you handle flaky tests in automation?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What are Flaky Tests and how do you handle them?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Flaky tests</strong> pass sometimes and fail sometimes without code changes — they erode trust in automation.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Cause 1 — Race conditions:</strong> Use explicit waits (<code>WebDriverWait</code>) not <code>sleep()</code></div>
+          <div class="key-point"><strong>Cause 2 — Shared test data:</strong> Use isolated, independent test data per test</div>
+          <div class="key-point"><strong>Cause 3 — Environment issues:</strong> Run in stable, dedicated test environments</div>
+          <div class="key-point"><strong>Cause 4 — Order dependency:</strong> Each test should be independent — use setup/teardown</div>
+          <div class="key-point">Track flakiness rate — quarantine persistently flaky tests and fix before re-adding</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Playwright and how is it different from Selenium?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Playwright? How does it compare to Selenium?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Feature</th><th>Playwright</th><th>Selenium</th></tr>
+          <tr><td>Creator</td><td>Microsoft (2020)</td><td>ThoughtWorks (2004)</td></tr>
+          <tr><td>Speed</td><td>Faster (parallel by default)</td><td>Slower</td></tr>
+          <tr><td>Auto-wait</td><td>Built-in smart waits</td><td>Manual explicit waits needed</td></tr>
+          <tr><td>Browsers</td><td>Chromium, Firefox, WebKit</td><td>All major browsers</td></tr>
+          <tr><td>Network intercept</td><td>Built-in</td><td>Needs extra libraries</td></tr>
+          <tr><td>Setup</td><td>Simple, single package</td><td>Requires drivers per browser</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 When to choose Playwright</div>
+          <div class="example-body">Modern web apps (SPAs, React, Angular) benefit greatly from Playwright's smart auto-waiting and built-in TypeScript support. Selenium is still preferred when you need maximum browser/OS compatibility or have a large existing test suite.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Cypress test automation framework?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What is Cypress and what makes it different?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Cypress</strong> is a JavaScript-based E2E testing framework that runs <em>inside</em> the browser, not alongside it. This gives it direct access to DOM, network, and application state.</p>
+        <div class="key-points">
+          <div class="key-point">No WebDriver — runs in same run loop as the app, making it much faster</div>
+          <div class="key-point">Automatic retries and waits built-in — no explicit waits needed</div>
+          <div class="key-point">Real-time test reloading and time-travel debugging in the UI</div>
+          <div class="key-point">Best for: JavaScript/TypeScript frontends, API testing, component testing</div>
+          <div class="key-point">Limitation: Only supports Chromium-based browsers (no IE, limited Safari)</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Appium mobile test automation?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">What is Appium? How does mobile test automation work?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Appium</strong> is an open-source mobile automation framework that uses the WebDriver protocol to automate native, hybrid, and mobile web apps on iOS and Android.</p>
+        <div class="key-points">
+          <div class="key-point">Android: Uses <code>UIAutomator2</code> driver under the hood</div>
+          <div class="key-point">iOS: Uses <code>XCUITest</code> driver under the hood</div>
+          <div class="key-point">Supports multiple languages: Java, Python, JavaScript, Ruby</div>
+          <div class="key-point">Run on real devices or emulators/simulators</div>
+          <div class="key-point">Cloud testing: <code>BrowserStack</code>, <code>Sauce Labs</code> provide real device farms</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Mobile Locators</div>
+          <div class="example-body">Mobile uses different locators: <code>accessibility id</code>, <code>xpath</code>, <code>-android uiautomator</code>, <code>-ios predicate string</code>. Accessibility IDs are preferred as they work on both platforms.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you maintain automation test suite as application changes?">
+      <div class="qa-question">
+        <span class="q-num">Q12</span>
+        <div>
+          <div class="q-text">How do you maintain an automation test suite as the application evolves?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Automation maintenance is one of the biggest challenges in QA. Without a strategy, test suites become bloated, flaky, and expensive to maintain.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Use POM:</strong> Centralise locators — one change in one place updates all tests using that element</div>
+          <div class="key-point"><strong>Version control:</strong> Store tests in Git alongside application code</div>
+          <div class="key-point"><strong>Regular reviews:</strong> Audit tests quarterly — remove obsolete, refactor fragile ones</div>
+          <div class="key-point"><strong>Fail fast:</strong> Keep test runs under 15 minutes — slow suites get ignored</div>
+          <div class="key-point"><strong>Tag tests:</strong> Smoke, regression, critical — run subsets based on change scope</div>
+          <div class="key-point"><strong>Update tests in same PR:</strong> Code change and test update go together, not separately</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is visual regression testing?">
+      <div class="qa-question">
+        <span class="q-num">Q13</span>
+        <div>
+          <div class="q-text">What is Visual Regression Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Visual Regression Testing</strong> automatically compares screenshots of the UI before and after a code change, flagging any unintended visual differences — broken layouts, shifted elements, wrong fonts, colour changes.</p>
+        <div class="key-points">
+          <div class="key-point">Takes a baseline screenshot, then compares against every new build</div>
+          <div class="key-point">Even 1 pixel difference can be flagged for review</div>
+          <div class="key-point">Tools: <code>Percy</code>, <code>Applitools Eyes</code>, <code>BackstopJS</code>, <code>Playwright</code> built-in snapshots</div>
+          <div class="key-point">Especially valuable for design-sensitive products and CSS refactors</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">A developer fixes a button colour on the checkout page. Visual regression testing catches that the font size also shifted by 2px — something functional testing would completely miss.</div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== AGILE ===================== -->
+<div class="category-section" data-cat="agile">
+  <div class="section-header">
+    <span class="section-icon">🏃</span>
+    <div>
+      <div class="section-title">Agile & Scrum</div>
+      <div class="section-desc">Testing in Agile environments — roles, ceremonies, practices</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is a user story and how do you derive test cases from it?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is a User Story and how do you write test cases from it?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">A <strong>User Story</strong> describes a feature from the user's perspective: <em>"As a [role], I want [feature], so that [benefit]."</em> Test cases come from the Acceptance Criteria attached to each story.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Example</div>
+          <div class="example-body">
+            <strong>User Story:</strong> "As a shopper, I want to filter products by price range, so that I can find items within my budget."<br><br>
+            <strong>Acceptance Criteria:</strong><br>
+            - Filter shows min/max price sliders<br>
+            - Products update in real-time as slider moves<br>
+            - Filter persists when navigating back<br><br>
+            Each acceptance criterion → 1+ test cases
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Definition of Done DoD in Agile?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">What is the Definition of Done (DoD)?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>DoD</strong> is a shared team agreement on what criteria must be met for a user story or feature to be considered "done." It prevents half-finished work from being marked complete.</p>
+        <div class="key-points">
+          <div class="key-point">Code written and peer-reviewed</div>
+          <div class="key-point">Unit tests written and passing</div>
+          <div class="key-point">All acceptance criteria tested and passed</div>
+          <div class="key-point">No critical/high bugs open</div>
+          <div class="key-point">Regression suite updated and passing</div>
+          <div class="key-point">Product Owner has signed off</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are Agile Scrum ceremonies and QA's role in each?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What are Scrum Ceremonies and QA's role in each?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Sprint Planning:</strong> QA reviews stories, identifies ambiguities in acceptance criteria, estimates testing effort</div>
+          <div class="key-point"><strong>Daily Standup:</strong> QA shares: what was tested yesterday, what's being tested today, any blockers</div>
+          <div class="key-point"><strong>Sprint Review:</strong> QA demos tested features to stakeholders, confirms acceptance criteria passed</div>
+          <div class="key-point"><strong>Retrospective:</strong> QA shares what went well/poorly with testing process and suggests improvements</div>
+          <div class="key-point"><strong>Backlog Refinement:</strong> QA reviews upcoming stories early — identifies testability issues before the sprint starts</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is test driven development TDD?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">What is TDD (Test-Driven Development)?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>TDD</strong> is a development practice where <em>tests are written before code</em>. The cycle: write a failing test → write minimal code to make it pass → refactor.</p>
+        <div class="example-block">
+          <div class="example-header">💡 Red-Green-Refactor Cycle</div>
+          <div class="example-body">
+            🔴 <strong>Red:</strong> Write a test for <code>calculateDiscount(100, 10%)</code> → returns 90. Test fails (code doesn't exist).<br>
+            🟢 <strong>Green:</strong> Write the minimal <code>calculateDiscount()</code> function to make the test pass.<br>
+            🔵 <strong>Refactor:</strong> Clean up the code — tests still pass, quality improves.<br><br>
+            Result: Every line of code has a test. Design is naturally testable.
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you estimate testing effort in Agile?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">How do you estimate testing effort in Agile?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">In Agile, estimation is collaborative and relative — using <strong>story points</strong> or <strong>T-shirt sizing</strong> rather than hours.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Story Points:</strong> Relative effort scale (1, 2, 3, 5, 8, 13...) — complexity, not time</div>
+          <div class="key-point"><strong>Planning Poker:</strong> Team votes simultaneously to prevent anchoring bias</div>
+          <div class="key-point">QA factors in: number of test cases, complexity of integration, regression scope, automation time</div>
+          <div class="key-point">Track velocity over sprints to improve future estimates</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What metrics does a QA use to measure quality in Agile?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What QA Metrics do you track to measure quality?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Defect Density:</strong> Number of bugs per module or feature — identifies risky areas</div>
+          <div class="key-point"><strong>Defect Escape Rate:</strong> % of bugs found in production vs. testing — measures QA effectiveness</div>
+          <div class="key-point"><strong>Test Pass Rate:</strong> % of test cases passing per sprint</div>
+          <div class="key-point"><strong>Test Coverage:</strong> % of requirements or code covered by tests</div>
+          <div class="key-point"><strong>Mean Time to Detect (MTTD):</strong> How quickly bugs are found after introduction</div>
+          <div class="key-point"><strong>Automation Coverage:</strong> % of regression tests automated</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the role of a QA in sprint planning and backlog grooming?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">What is QA's role in Sprint Planning and Backlog Grooming?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">QA brings a unique perspective to planning sessions — they think about <em>what can go wrong</em>, not just what needs to be built.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Sprint Planning:</strong> Break down user stories into testable acceptance criteria; flag ambiguous or untestable requirements</div>
+          <div class="key-point"><strong>Backlog Grooming:</strong> Review upcoming stories early — identify missing requirements, missing test data, unclear edge cases</div>
+          <div class="key-point">Raise "testability" concerns: if a feature can't be verified, it shouldn't be committed to the sprint</div>
+          <div class="key-point">Provide testing effort estimates to contribute to sprint capacity planning</div>
+          <div class="key-point">Identify dependencies: "We can't test Feature B until Feature A's API is complete"</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is a sprint retrospective and QA's input?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">How does QA contribute to a Sprint Retrospective?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">The <strong>retrospective</strong> is the team's opportunity to inspect its process and improve. QA's input is crucial for improving the quality pipeline, not just the code.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Went well:</strong> "Automation for the login flow saved us 3 hours this sprint"</div>
+          <div class="key-point"><strong>To improve:</strong> "We received the build too late to complete full regression — we need builds by Wednesday"</div>
+          <div class="key-point"><strong>Action items:</strong> "Add test environment health check to the Definition of Done"</div>
+          <div class="key-point">Share metrics: pass rate, defects found, test execution time trends</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is Kanban and how does testing work in Kanban?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is Kanban and how does QA fit into it?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Kanban</strong> is a flow-based Agile framework with no fixed sprints. Work flows through columns (To Do → In Dev → In Test → Done) with work-in-progress (WIP) limits to prevent bottlenecks.</p>
+        <div class="key-points">
+          <div class="key-point">QA is a "column" on the board — items move to QA when development is complete</div>
+          <div class="key-point">WIP limits prevent QA from being overwhelmed: e.g. max 3 items in "In Test" at once</div>
+          <div class="key-point">No sprint end date — continuous delivery, continuous testing</div>
+          <div class="key-point">Bugs return to the developer's column, not a separate "Bug" column ideally</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are the challenges of testing in Agile compared to Waterfall?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What are the key challenges of QA in Agile?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Time pressure:</strong> Sprint deadlines are fixed — testing time shrinks when development runs late</div>
+          <div class="key-point"><strong>Incomplete requirements:</strong> User stories may lack detail at the start of a sprint</div>
+          <div class="key-point"><strong>Regression growth:</strong> Each sprint adds features — regression suite must keep pace</div>
+          <div class="key-point"><strong>Constant context switching:</strong> Testers move between features quickly, reducing depth</div>
+          <div class="key-point"><strong>Early feedback dependency:</strong> Developers need instant test feedback — automation becomes essential</div>
+          <div class="key-point"><strong>Solutions:</strong> Automate regression, embed QA in dev discussions early, maintain clear acceptance criteria</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is testing in a continuous delivery CD environment?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">How do you test in a Continuous Delivery environment?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Continuous Delivery means code can be deployed to production <em>at any time</em>. Testing must be fast, automated, and confidence-giving — the pipeline is the gatekeeper.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Automated smoke tests:</strong> Run on every commit — fast, broad, catches obvious breakage</div>
+          <div class="key-point"><strong>Automated regression:</strong> Run nightly or on every merge to main branch</div>
+          <div class="key-point"><strong>Contract testing:</strong> Verify API contracts between services haven't changed (e.g. Pact)</div>
+          <div class="key-point"><strong>Deployment verification:</strong> Run post-deployment health checks automatically</div>
+          <div class="key-point"><strong>Feature flags:</strong> Test new features in production without exposing them to all users</div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== API TESTING ===================== -->
+<div class="category-section" data-cat="api">
+  <div class="section-header">
+    <span class="section-icon">🔌</span>
+    <div>
+      <div class="section-title">API Testing</div>
+      <div class="section-desc">REST APIs, tools, and best practices for API QA</div>
+    </div>
+  </div>
+  <div class="qa-list">
+
+    <div class="qa-card" data-q="What is API testing and why is it important?">
+      <div class="qa-question">
+        <span class="q-num">Q01</span>
+        <div>
+          <div class="q-text">What is API Testing and why is it important for QA?</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>API Testing</strong> validates that APIs (Application Programming Interfaces) return correct data, handle errors properly, and perform well — without going through the UI. It sits in the middle of the automation pyramid.</p>
+        <div class="key-points">
+          <div class="key-point">Faster than UI testing — no browser rendering needed</div>
+          <div class="key-point">More stable — APIs change less often than UI</div>
+          <div class="key-point">Catches integration bugs between frontend and backend early</div>
+          <div class="key-point">Can be done before the UI is even built</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are HTTP methods REST API GET POST PUT DELETE PATCH?">
+      <div class="qa-question">
+        <span class="q-num">Q02</span>
+        <div>
+          <div class="q-text">Explain HTTP Methods: GET, POST, PUT, PATCH, DELETE</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Method</th><th>Action</th><th>Example</th></tr>
+          <tr><td>GET</td><td>Retrieve data (read-only)</td><td>Get user profile</td></tr>
+          <tr><td>POST</td><td>Create new resource</td><td>Register new user</td></tr>
+          <tr><td>PUT</td><td>Update entire resource</td><td>Replace full user record</td></tr>
+          <tr><td>PATCH</td><td>Update partial resource</td><td>Change only email field</td></tr>
+          <tr><td>DELETE</td><td>Remove resource</td><td>Delete a user account</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What are HTTP status codes? What do 200 400 401 403 404 500 mean?">
+      <div class="qa-question">
+        <span class="q-num">Q03</span>
+        <div>
+          <div class="q-text">What are HTTP Status Codes? Explain the key ones.</div>
+          <div class="q-tags"><span class="q-tag tag-basic">Basic</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Code</th><th>Meaning</th><th>Example</th></tr>
+          <tr><td>200 OK</td><td>Success</td><td>GET user data returned</td></tr>
+          <tr><td>201 Created</td><td>Resource created</td><td>POST new user created</td></tr>
+          <tr><td>204 No Content</td><td>Success, no body</td><td>DELETE successful</td></tr>
+          <tr><td>400 Bad Request</td><td>Invalid input</td><td>Missing required field</td></tr>
+          <tr><td>401 Unauthorized</td><td>Not authenticated</td><td>No token provided</td></tr>
+          <tr><td>403 Forbidden</td><td>Authenticated but no access</td><td>Regular user accessing admin</td></tr>
+          <tr><td>404 Not Found</td><td>Resource doesn't exist</td><td>User ID not in DB</td></tr>
+          <tr><td>500 Internal Server Error</td><td>Server crashed</td><td>Unhandled exception in code</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="How do you test an API using Postman?">
+      <div class="qa-question">
+        <span class="q-num">Q04</span>
+        <div>
+          <div class="q-text">How do you test a REST API using Postman?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>1. Create request:</strong> Select method (GET/POST), enter endpoint URL</div>
+          <div class="key-point"><strong>2. Add headers:</strong> Content-Type: application/json, Authorization token</div>
+          <div class="key-point"><strong>3. Add request body:</strong> JSON payload for POST/PUT requests</div>
+          <div class="key-point"><strong>4. Send request:</strong> Click Send and inspect response</div>
+          <div class="key-point"><strong>5. Write assertions:</strong> In Tests tab, validate status code, response body, headers</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Postman Test Script</div>
+          <div class="example-body">
+            <code>pm.test("Status is 200", () => {</code><br>
+            <code>&nbsp;&nbsp;pm.response.to.have.status(200);</code><br>
+            <code>});</code><br>
+            <code>pm.test("User ID present", () => {</code><br>
+            <code>&nbsp;&nbsp;const body = pm.response.json();</code><br>
+            <code>&nbsp;&nbsp;pm.expect(body).to.have.property("id");</code><br>
+            <code>});</code>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What should you test when testing an API endpoint?">
+      <div class="qa-question">
+        <span class="q-num">Q05</span>
+        <div>
+          <div class="q-text">What do you check when testing an API endpoint?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <div class="key-points">
+          <div class="key-point"><strong>Status code:</strong> Is it returning 200, 201, 400, 404 as expected?</div>
+          <div class="key-point"><strong>Response body:</strong> Are all fields present with correct data types and values?</div>
+          <div class="key-point"><strong>Response time:</strong> Is it responding within SLA (e.g. under 500ms)?</div>
+          <div class="key-point"><strong>Headers:</strong> Content-Type, CORS, Cache-Control correct?</div>
+          <div class="key-point"><strong>Error handling:</strong> What happens with invalid input, missing fields, wrong data types?</div>
+          <div class="key-point"><strong>Authentication:</strong> Does it reject requests without valid tokens?</div>
+          <div class="key-point"><strong>Data persistence:</strong> Does POST actually save data? Does DELETE actually remove it?</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is the difference between REST and SOAP APIs?">
+      <div class="qa-question">
+        <span class="q-num">Q06</span>
+        <div>
+          <div class="q-text">What is the difference between REST and SOAP APIs?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <table class="compare-table">
+          <tr><th>Feature</th><th>REST</th><th>SOAP</th></tr>
+          <tr><td>Format</td><td>JSON (usually)</td><td>XML only</td></tr>
+          <tr><td>Protocol</td><td>HTTP</td><td>HTTP, SMTP, TCP</td></tr>
+          <tr><td>Speed</td><td>Faster, lightweight</td><td>Slower, more overhead</td></tr>
+          <tr><td>Standards</td><td>Flexible</td><td>Strict (WSDL, WS-*)</td></tr>
+          <tr><td>Use Case</td><td>Web/mobile APIs</td><td>Enterprise, banking</td></tr>
+          <tr><td>Tools</td><td>Postman, RestAssured</td><td>SoapUI, Postman</td></tr>
+        </table>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is API authentication testing OAuth JWT token?">
+      <div class="qa-question">
+        <span class="q-num">Q07</span>
+        <div>
+          <div class="q-text">How do you test API Authentication? (OAuth, JWT, API Keys)</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">Authentication testing ensures only authorised users can access protected endpoints. The method depends on the auth mechanism used.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>API Key:</strong> Test with valid key → 200. Invalid key → 401. Expired key → 401.</div>
+          <div class="key-point"><strong>JWT (Bearer Token):</strong> Test with valid token → 200. Expired token → 401. Tampered token → 401/403. No token → 401.</div>
+          <div class="key-point"><strong>OAuth 2.0:</strong> Test the full flow — authorisation code, token exchange, refresh token, token revocation</div>
+          <div class="key-point"><strong>Boundary tests:</strong> Access admin endpoint with a regular user token → should return 403 Forbidden</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Postman — Using Bearer Token</div>
+          <div class="example-body">In Postman: Auth tab → Bearer Token → paste JWT.<br>Test with expired token by manually changing the <code>exp</code> claim in the token payload — API should reject it with 401.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is API contract testing and consumer driven contract testing?">
+      <div class="qa-question">
+        <span class="q-num">Q08</span>
+        <div>
+          <div class="q-text">What is API Contract Testing?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Contract Testing</strong> verifies that two services (consumer and provider) agree on the shape and content of their API interactions. It catches breaking changes before they reach integration or production.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Consumer:</strong> The service that calls the API (frontend, mobile app, another service)</div>
+          <div class="key-point"><strong>Provider:</strong> The service that exposes the API (backend)</div>
+          <div class="key-point">The consumer defines a "contract" — what it expects the API to return</div>
+          <div class="key-point">The provider verifies it can fulfil that contract without running the consumer</div>
+          <div class="key-point">Tool: <code>Pact</code> — most popular consumer-driven contract testing framework</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 Why it matters</div>
+          <div class="example-body">Backend renames JSON field <code>user_name</code> to <code>username</code>. Without contract testing, this silent breaking change only surfaces when the frontend crashes in production.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is API mocking and stubbing in testing?">
+      <div class="qa-question">
+        <span class="q-num">Q09</span>
+        <div>
+          <div class="q-text">What is API Mocking and Stubbing? When do you use them?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>Mocking/Stubbing</strong> replaces a real API with a fake one that returns pre-configured responses. This allows testing when the real API is unavailable, unstable, or would charge per call.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Mock:</strong> A programmable fake that can verify interactions (was it called? how many times?)</div>
+          <div class="key-point"><strong>Stub:</strong> A simple replacement that returns fixed responses — no verification</div>
+          <div class="key-point">Use when: third-party APIs (payment gateways, SMS services) aren't available in test env</div>
+          <div class="key-point">Use when: simulating error scenarios (500 responses, timeouts) that are hard to trigger in real APIs</div>
+          <div class="key-point">Tools: <code>WireMock</code>, <code>Mockoon</code>, <code>MSW (Mock Service Worker)</code></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is GraphQL testing and how is it different from REST?">
+      <div class="qa-question">
+        <span class="q-num">Q10</span>
+        <div>
+          <div class="q-text">What is GraphQL and how does testing differ from REST?</div>
+          <div class="q-tags"><span class="q-tag tag-advanced">Advanced</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text"><strong>GraphQL</strong> is a query language for APIs where clients request exactly the data they need — no over-fetching or under-fetching. Unlike REST's multiple endpoints, GraphQL uses a single endpoint with flexible queries.</p>
+        <table class="compare-table">
+          <tr><th>REST</th><th>GraphQL</th></tr>
+          <tr><td>Multiple endpoints</td><td>Single endpoint (<code>/graphql</code>)</td></tr>
+          <tr><td>Fixed response shape</td><td>Client controls response shape</td></tr>
+          <tr><td>GET, POST, PUT, DELETE</td><td>Query (read), Mutation (write), Subscription (real-time)</td></tr>
+          <tr><td>Test each endpoint</td><td>Test queries, mutations, and schema validation</td></tr>
+        </table>
+        <div class="example-block">
+          <div class="example-header">💡 GraphQL Test Considerations</div>
+          <div class="example-body">Test deeply nested queries, test with missing/wrong field names, test mutations that create/update data, verify schema introspection is disabled in production (security risk), test subscription events fire correctly.</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="qa-card" data-q="What is API performance testing and how do you test API response time?">
+      <div class="qa-question">
+        <span class="q-num">Q11</span>
+        <div>
+          <div class="q-text">How do you test API Performance?</div>
+          <div class="q-tags"><span class="q-tag tag-intermediate">Intermediate</span></div>
+        </div>
+        <span class="q-chevron">▾</span>
+      </div>
+      <div class="qa-answer"><div class="answer-inner">
+        <p class="answer-text">API performance testing measures response time, throughput, and behaviour under load — without any UI overhead. It's faster and more targeted than UI-based performance testing.</p>
+        <div class="key-points">
+          <div class="key-point"><strong>Response time assertion in Postman:</strong> <code>pm.expect(pm.response.responseTime).to.be.below(500);</code></div>
+          <div class="key-point"><strong>JMeter:</strong> Send 1,000 concurrent API requests, measure average/95th percentile response time</div>
+          <div class="key-point"><strong>k6:</strong> Write load test scripts in JavaScript, run against API endpoints directly</div>
+          <div class="key-point">Key metrics: Average response time, p95/p99 latency, error rate %, requests per second</div>
+          <div class="key-point">Industry SLAs: Most APIs target &lt;200ms average response for non-complex operations</div>
+        </div>
+        <div class="example-block">
+          <div class="example-header">💡 k6 Script Example</div>
+          <div class="example-body">
+            <code>import http from 'k6/http';</code><br>
+            <code>export default function () {</code><br>
+            <code>&nbsp;&nbsp;const res = http.get('https://api.example.com/users');</code><br>
+            <code>&nbsp;&nbsp;check(res, { 'status 200': r => r.status === 200 });</code><br>
+            <code>}</code><br>
+            Run with: <code>k6 run --vus 100 --duration 30s script.js</code>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="footer-left">
+    The Tester's Handbook · QA Interview Guide 2025<br>
+    Click any question to expand · Use search to filter
+  </div>
+  <div class="footer-right">// Happy Testing ✓</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ===== TAB NAVIGATION =====
+const tabs = document.querySelectorAll('.nav-tab');
+const sections = document.querySelectorAll('.category-section');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const cat = tab.dataset.cat;
+    tabs.forEach(t => t.classList.remove('active'));
+    sections.forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector(`.category-section[data-cat="${cat}"]`).classList.add('active');
+    document.getElementById('search-results').classList.remove('active');
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-count').textContent = '';
+  });
+});
+
+// ===== Q&A ACCORDION =====
+document.querySelectorAll('.qa-question').forEach(q => {
+  q.addEventListener('click', () => {
+    const card = q.closest('.qa-card');
+    const isOpen = card.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.qa-card.open').forEach(c => c.classList.remove('open'));
+    // Open clicked if it was closed
+    if (!isOpen) card.classList.add('open');
+  });
+});
+
+// ===== SEARCH =====
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+const searchCount = document.getElementById('search-count');
+
+searchInput.addEventListener('input', () => {
+  const query = searchInput.value.trim().toLowerCase();
+
+  if (!query) {
+    searchResults.classList.remove('active');
+    searchCount.textContent = '';
+    // Restore active tab section
+    const activeTab = document.querySelector('.nav-tab.active');
+    if (activeTab) {
+      const cat = activeTab.dataset.cat;
+      document.querySelectorAll('.category-section').forEach(s => s.classList.remove('active'));
+      document.querySelector(`.category-section[data-cat="${cat}"]`).classList.add('active');
+    }
+    return;
+  }
+
+  // Hide all category sections
+  sections.forEach(s => s.classList.remove('active'));
+
+  // Gather all cards
+  const allCards = document.querySelectorAll('.qa-card');
+  const matches = [];
+
+  allCards.forEach(card => {
+    const qText = card.dataset.q?.toLowerCase() || '';
+    const fullText = card.textContent.toLowerCase();
+    if (qText.includes(query) || fullText.includes(query)) {
+      matches.push(card.cloneNode(true));
+    }
+  });
+
+  if (matches.length === 0) {
+    searchResults.innerHTML = `<div class="no-results">No questions found for "<strong>${query}</strong>"<br><span style="font-size:0.65rem;color:var(--text-dim)">Try different keywords</span></div>`;
+  } else {
+    const list = document.createElement('div');
+    list.className = 'qa-list';
+    matches.forEach(m => {
+      list.appendChild(m);
+      // Re-attach click events for cloned elements
+      m.querySelector('.qa-question').addEventListener('click', () => {
+        const isOpen = m.classList.contains('open');
+        list.querySelectorAll('.qa-card.open').forEach(c => c.classList.remove('open'));
+        if (!isOpen) m.classList.add('open');
+      });
+    });
+
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.s
