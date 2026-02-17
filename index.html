@@ -988,7 +988,7 @@ footer {
         <div class="example-block">
           <div class="example-header">💡 Example — Email field</div>
           <div class="example-body">
-            <strong>Positive:</strong> Enter <code>user@example.com</code> → form submits successfully ✅<br><br>
+            <strong>Positive:</strong> Enter <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6b1e180e192b0e130a061b070e45080406">[email&#160;protected]</a></code> → form submits successfully ✅<br><br>
             <strong>Negative:</strong><br>
             Enter <code>userexample.com</code> (no @) → error message shown ✅<br>
             Enter <code>user@</code> (incomplete) → error message shown ✅<br>
@@ -3133,7 +3133,7 @@ footer {
   <div class="footer-right">// Happy Testing ✓</div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ===== TAB NAVIGATION =====
 const tabs = document.querySelectorAll('.nav-tab');
 const sections = document.querySelectorAll('.category-section');
@@ -3144,7 +3144,8 @@ tabs.forEach(tab => {
     tabs.forEach(t => t.classList.remove('active'));
     sections.forEach(s => s.classList.remove('active'));
     tab.classList.add('active');
-    document.querySelector(`.category-section[data-cat="${cat}"]`).classList.add('active');
+    const targetSection = document.querySelector('.category-section[data-cat="' + cat + '"]');
+    if (targetSection) targetSection.classList.add('active');
     document.getElementById('search-results').classList.remove('active');
     document.getElementById('search-input').value = '';
     document.getElementById('search-count').textContent = '';
@@ -3152,15 +3153,14 @@ tabs.forEach(tab => {
 });
 
 // ===== Q&A ACCORDION =====
-document.querySelectorAll('.qa-question').forEach(q => {
-  q.addEventListener('click', () => {
-    const card = q.closest('.qa-card');
-    const isOpen = card.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.qa-card.open').forEach(c => c.classList.remove('open'));
-    // Open clicked if it was closed
-    if (!isOpen) card.classList.add('open');
-  });
+document.addEventListener('click', function(e) {
+  const questionEl = e.target.closest('.qa-question');
+  if (!questionEl) return;
+  const card = questionEl.closest('.qa-card');
+  if (!card) return;
+  const isOpen = card.classList.contains('open');
+  document.querySelectorAll('.qa-card.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) card.classList.add('open');
 });
 
 // ===== SEARCH =====
@@ -3173,47 +3173,55 @@ searchInput.addEventListener('input', () => {
 
   if (!query) {
     searchResults.classList.remove('active');
+    searchResults.innerHTML = '';
     searchCount.textContent = '';
-    // Restore active tab section
     const activeTab = document.querySelector('.nav-tab.active');
     if (activeTab) {
       const cat = activeTab.dataset.cat;
       document.querySelectorAll('.category-section').forEach(s => s.classList.remove('active'));
-      document.querySelector(`.category-section[data-cat="${cat}"]`).classList.add('active');
+      const target = document.querySelector('.category-section[data-cat="' + cat + '"]');
+      if (target) target.classList.add('active');
     }
     return;
   }
 
-  // Hide all category sections
   sections.forEach(s => s.classList.remove('active'));
 
-  // Gather all cards
   const allCards = document.querySelectorAll('.qa-card');
   const matches = [];
 
   allCards.forEach(card => {
-    const qText = card.dataset.q?.toLowerCase() || '';
+    const qText = (card.dataset.q || '').toLowerCase();
     const fullText = card.textContent.toLowerCase();
     if (qText.includes(query) || fullText.includes(query)) {
       matches.push(card.cloneNode(true));
     }
   });
 
-  if (matches.length === 0) {
-    searchResults.innerHTML = `<div class="no-results">No questions found for "<strong>${query}</strong>"<br><span style="font-size:0.65rem;color:var(--text-dim)">Try different keywords</span></div>`;
-  } else {
-    const list = document.createElement('div');
-    list.className = 'qa-list';
-    matches.forEach(m => {
-      list.appendChild(m);
-      // Re-attach click events for cloned elements
-      m.querySelector('.qa-question').addEventListener('click', () => {
-        const isOpen = m.classList.contains('open');
-        list.querySelectorAll('.qa-card.open').forEach(c => c.classList.remove('open'));
-        if (!isOpen) m.classList.add('open');
-      });
-    });
+  searchResults.innerHTML = '';
 
+  if (matches.length === 0) {
+    searchResults.innerHTML = '<div class="no-results">No questions found for <strong>' + query + '</strong><br><span style="font-size:0.65rem;color:var(--text-dim)">Try different keywords</span></div>';
+  } else {
     const hdr = document.createElement('div');
     hdr.className = 'section-header';
-    hdr.s
+    hdr.style.marginBottom = '1.5rem';
+    hdr.innerHTML = '<span class="section-icon">⌕</span><div><div class="section-title">Search Results</div><div class="section-desc">Showing ' + matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for &ldquo;' + query + '&rdquo;</div></div>';
+
+    const list = document.createElement('div');
+    list.className = 'qa-list';
+
+    matches.forEach(m => {
+      list.appendChild(m);
+    });
+
+    searchResults.appendChild(hdr);
+    searchResults.appendChild(list);
+  }
+
+  searchResults.classList.add('active');
+  searchCount.textContent = matches.length > 0 ? matches.length + ' question' + (matches.length !== 1 ? 's' : '') + ' found' : '';
+});
+</script>
+</body>
+</html>
